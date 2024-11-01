@@ -1,30 +1,100 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
+using NUnit.Framework.Internal;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
 {
+    private static Person ExpectedTsar() => new Person("Ivan IV The Terrible", 54, 170, 70,
+        new Person("Vasili III of Russia", 28, 170, 60, null));
+    
     [Test]
-    [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
-    public void CheckCurrentTsar()
+    [Description("Проверка имени текущего царя")]
+    public void CheckCurrentTsarName()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
+        var actualTsarName = TsarRegistry.GetCurrentTsar().Name;
 
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsarName.Should().Be(ExpectedTsar().Name);
     }
+
+    [Test]
+    [Description("Проверка возраста текущего царя")]
+    public void CheckCurrentTsarAge()
+    {
+        var actualTsarAge = TsarRegistry.GetCurrentTsar().Age;
+
+        actualTsarAge.Should().Be(ExpectedTsar().Age);
+    }
+
+    [Test]
+    [Description("Проверка роста текущего царя")]
+    public void CheckCurrentTsarHeight()
+    {
+        var actualTsarHeight = TsarRegistry.GetCurrentTsar().Height;
+
+        actualTsarHeight.Should().Be(ExpectedTsar().Height);
+    }
+
+    [Test]
+    [Description("Проверка веса текущего царя")]
+    public void CheckCurrentTsarWeight()
+    {
+        var actualTsarWeight = TsarRegistry.GetCurrentTsar().Weight;
+
+        actualTsarWeight.Should().Be(ExpectedTsar().Weight);
+    }
+
+    [Test]
+    [Description("Проверка имени родителя текущего царя")]
+
+    public void CheckCurrentTsarParentName()
+    {
+        var actualTsarParentName = TsarRegistry.GetCurrentTsar().Parent.Name;
+
+        actualTsarParentName.Should().Be(ExpectedTsar().Parent.Name);
+    }
+
+    [Test]
+    [Description("Проверка возраста родителя текущего царя")]
+
+    public void CheckCurrentTsarParentAge()
+    {
+        var actualTsarParentAge = TsarRegistry.GetCurrentTsar().Parent.Age;
+
+        actualTsarParentAge.Should().Be(ExpectedTsar().Parent.Age);
+    }
+
+    [Test]
+    [Description("Проверка роста родителя текущего царя")]
+
+    public void CheckCurrentTsarParentHeight()
+    {
+        var actualTsarParentHeight = TsarRegistry.GetCurrentTsar().Parent.Height;
+
+        actualTsarParentHeight.Should().Be(ExpectedTsar().Parent.Height);
+    }
+
+    [Test]
+    [Description("Проверка веса родителя текущего царя")]
+
+    public void CheckCurrentTsarParentWeight()
+    {
+        var actualTsarParentWeight = TsarRegistry.GetCurrentTsar().Parent.Weight;
+
+        actualTsarParentWeight.Should().Be(ExpectedTsar().Parent.Weight);
+    }
+
+    [Test]
+    [Description("Проверка деда/бабки текущего царя")]
+
+    public void CheckCurrentTsarParentParent()
+    {
+        var actualTsarParentParent = TsarRegistry.GetCurrentTsar().Parent.Parent;
+
+        actualTsarParentParent.Should().Be(ExpectedTsar().Parent.Parent);
+    }
+
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
@@ -35,6 +105,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        // Если бы за полями класса стояла бы какая-то нетривиальная логика, то хотелось, чтобы тесты
+        //отражали проверку каждого по отдельности. Мне кажется, что альтернативное решение не обеспечивает
+        //необходимую наглядность и скорее всего оказалось бы сложным для отладки
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
