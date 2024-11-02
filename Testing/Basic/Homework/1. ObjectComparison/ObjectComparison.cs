@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +15,15 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        actualTsar.Should().BeEquivalentTo(expectedTsar,
+            options => options
+                .Excluding(tsar => tsar.Id)
+                .Excluding(tsar => tsar.Parent));
 
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        expectedTsar.Parent.Should().BeEquivalentTo(actualTsar.Parent,
+            options => options
+                .Excluding(tsar => tsar.Id)
+                .Excluding(tsar => tsar.Weight));
     }
 
     [Test]
@@ -34,7 +34,14 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        /* Какие недостатки у такого подхода?
+             1) Много кода (отдельный метод для сравнения)
+             2) Плохая читаемость и выразительность в сравнении с использованием FluentAssertions
+             3) Плохая расширяемость (для добавления нового функционала необходимо писать новые методы)
+             4) Смена фреймворка приведет к необходимости переписывания теста
+             5) Зачем реализовывать то, что уже есть в FluentAssertions?
+             Такой метод тяжело поддерживать.
+         */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
