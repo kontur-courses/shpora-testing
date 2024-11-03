@@ -1,31 +1,49 @@
-﻿
+﻿using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void Test()
+    [TestCase("0.0", 17, 2, true, ExpectedResult = true)]
+    [TestCase("0", 17, 2, true, ExpectedResult = true)]
+    [TestCase("00.00", 3, 2, true, ExpectedResult = false)]
+    [TestCase("+0.00", 3, 2, true, ExpectedResult = false)]
+    [TestCase("+1.23", 4, 2, true, ExpectedResult = true)]
+    [TestCase("0.000", 17, 2, true, ExpectedResult = false)]
+    [TestCase("a.sd", 3, 2, true, ExpectedResult = false)]
+    [TestCase("000.00", 17, 2, true, ExpectedResult = true)]
+    [TestCase("-1.23", 4, 2, true, ExpectedResult = false)]
+    [TestCase("-1.23", 4, 2, false, ExpectedResult = true)]
+    [TestCase("   ", 4, 2, true, ExpectedResult = false)]
+    [TestCase(null, 4, 2, true, ExpectedResult = false)]
+    [TestCase("0,0", 17, 2, true, ExpectedResult = true)]
+    [TestCase("0.", 17, 2, true, ExpectedResult = false)]
+    [TestCase(".0", 17, 2, true, ExpectedResult = false)]
+    [TestCase("0..0", 17, 2, true, ExpectedResult = false)]
+    [TestCase("+-3", 17, 2, true, ExpectedResult = false)]
+    public bool IsValidNumber(string number, int precision, int scale = 0, bool onlyPositive = false)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
+        return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(number);
+    }
+    
+    [TestCase(0, 1, true, TestName = "precision == 0")]
+    [TestCase(-1, 1, true, TestName = "precision < 0")]
+    [TestCase(1, -1, true, TestName = "scale < 0")]
+    [TestCase(2, 2, true, TestName = "scale == precision")]
+    [TestCase(1, 2, true, TestName = "scale > precision")]
+    public void NumberValidator_ShouldThrowExc_AfterInvalidArgs(int precision, int scale = 0, bool onlyPositive = false)
+    {
+        var action = () => new NumberValidator(precision, scale, onlyPositive);
+        action.Should().Throw<ArgumentException>();
+    }
+    
+    [TestCase(3, 2, true)]
+    [TestCase(3)]
+    public void NumberValidator_ShouldNotThrowExc_AfterValidArgs(int precision, int scale = 0, bool onlyPositive = false)
+    {
+        var action = () => new NumberValidator(precision, scale, onlyPositive);
+        action.Should().NotThrow();
     }
 }
