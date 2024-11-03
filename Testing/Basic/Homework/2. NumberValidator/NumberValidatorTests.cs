@@ -8,7 +8,7 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test, TestCaseSource(nameof(ValidatorTestCases))]
+    [TestCaseSource(nameof(ValidatorTestCases))]
     public bool IsValid(NumberValidator numberValidator, string number)
     {
         return numberValidator.IsValidNumber(number);
@@ -80,13 +80,19 @@ public class NumberValidatorTests
         }
     }
 
-    [Test]
-    public void Test()
+    [TestCase(-1, 2, true, TestName = "negative precision")]
+    [TestCase(1, -2, true, TestName = "negative scale")]
+    [TestCase(1, 2, true, TestName = "scale >= precision")]
+    public void NumberValidator_ThrowsException_AfterWrongCreation(int precision, int scale, bool onlyPositive)
     {
-        var wrongCreation = () => new NumberValidator(-1, 2, true);
-        var rightCreation = () => new NumberValidator(1, 0, true);
-        
+        var wrongCreation = () => new NumberValidator(precision, scale, onlyPositive);
         wrongCreation.Should().Throw<ArgumentException>();
-        rightCreation.Should().NotThrow<ArgumentException>();
+    }
+
+    [Test]
+    public void NumberValidator_DoesNotThrowException_AfterRightCreation()
+    {
+        var rightCreation = () => new NumberValidator(3, 2, true);
+        rightCreation.Should().NotThrow();
     }
 }
