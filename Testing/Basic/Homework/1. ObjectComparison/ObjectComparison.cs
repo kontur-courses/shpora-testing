@@ -13,9 +13,9 @@ public class ObjectComparison
         var actualTsar = TsarRegistry.GetCurrentTsar();
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
-
+        
         actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
-            options.Excluding(x => x.Name == "Id" && x.DeclaringType == typeof(Person)));
+            options.Excluding(x => x.Name == nameof(Person.Id) && x.DeclaringType == typeof(Person)));
     }
 
     [Test]
