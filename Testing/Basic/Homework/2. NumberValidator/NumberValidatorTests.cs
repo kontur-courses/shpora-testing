@@ -7,52 +7,41 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorShould
 {
-    [Test]
-    public void ThrowArgumentException_AfterCreatingWithNegativePrecision()
+    [Test, TestCaseSource(nameof(InvalidPrecisionAndScaleData))]
+    public void ThrowArgumentException_AfterCreatingWithInvalidPrecisionAndScale(int precision, int scale)
     {
-        var createNvWithNegativePrecision = () => new NumberValidator(-1);
+        var createNumberValidator = () => new NumberValidator(precision, scale);
 
-        createNvWithNegativePrecision.Should().Throw<ArgumentException>();
+        createNumberValidator.Should().Throw<ArgumentException>();
     }
 
-    [Test]
-    public void ThrowArgumentException_AfterCreatingWithPrecisionEqualsToZero()
+    private static IEnumerable InvalidPrecisionAndScaleData
     {
-        var createNvWithPrecisionEqualsToZero = () => new NumberValidator(0);
-
-        createNvWithPrecisionEqualsToZero.Should().Throw<ArgumentException>();
+        get
+        {
+            yield return new TestCaseData(-1, 0);
+            yield return new TestCaseData(0, 0);
+            yield return new TestCaseData(1, -2);
+            yield return new TestCaseData(1, 2);
+            yield return new TestCaseData(1, 1);
+        }
     }
 
-    [Test]
-    public void ThrowArgumentException_AfterCreatingWithNegativeScale()
+    [Test, TestCaseSource(nameof(ValidPrecisionAndScaleData))]
+    public void NotThrowArgumentException_AfterCreatingWithValidPrecisionAndScale(int precision, int scale)
     {
-        var createNvWithNegativeScale = () => new NumberValidator(1, -2);
+        var createNumberValidator = () => new NumberValidator(precision, scale);
 
-        createNvWithNegativeScale.Should().Throw<ArgumentException>();
+        createNumberValidator.Should().NotThrow<ArgumentException>();
     }
 
-    [Test]
-    public void ThrowArgumentException_AfterCreatingWithScaleMoreThanPrecision()
+    private static IEnumerable ValidPrecisionAndScaleData
     {
-        var createNvWithScaleMoreThanPrecision = () => new NumberValidator(1, 2);
-
-        createNvWithScaleMoreThanPrecision.Should().Throw<ArgumentException>();
-    }
-
-    [Test]
-    public void ThrowArgumentException_AfterCreatingWithScaleEqualsToPrecision()
-    {
-        var createNvWithScaleEqualsToPrecision = () => new NumberValidator(1, 1);
-
-        createNvWithScaleEqualsToPrecision.Should().Throw<ArgumentException>();
-    }
-
-    [Test]
-    public void NotThrowArgumentException_AfterCreatingWithPositivePrecision()
-    {
-        var createNvWithPositivePrecision = () => new NumberValidator(1);
-
-        createNvWithPositivePrecision.Should().NotThrow<ArgumentException>();
+        get
+        {
+            yield return new TestCaseData(3, 2);
+            yield return new TestCaseData(int.MaxValue, int.MaxValue - 1);
+        }
     }
 
     [Test, TestCaseSource(nameof(ValidTestCases))]
@@ -74,13 +63,13 @@ public class NumberValidatorShould
         }
     }
 
-    [Test, TestCaseSource(nameof(NotValidTestCases))]
+    [Test, TestCaseSource(nameof(InvalidTestCases))]
     public bool ReturnFalse_AfterCheckingValid(int precision, int scale, bool onlyPositive, string str)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
     }
 
-    public static IEnumerable NotValidTestCases
+    public static IEnumerable InvalidTestCases
     {
         get
         {
