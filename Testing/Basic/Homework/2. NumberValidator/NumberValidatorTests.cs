@@ -11,41 +11,24 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
 
-    [TestCase("0", 1, 0, true, ExpectedResult = true, 
-        TestName = "number=0; precision=1; scale=0; onlyPositive=true" )]
-    [TestCase("0.1", 2, 1, true, ExpectedResult = true,
-        TestName = "number=0.1; precision=2; scale=1; onlyPositive=true" )]
-    [TestCase("0,1", 2, 1, true, ExpectedResult = true,
-        TestName = "number=0,1; precision=2; scale=1; onlyPositive=true" )]
-    [TestCase("-1", 2, 0, false, ExpectedResult = true,
-        TestName = "number=-1; precision=2; scale=0; onlyPositive=false" )]
-    [TestCase("-1.1", 3, 1, false, ExpectedResult = true,
-        TestName = "number=-1.1; precision=3; scale=1; onlyPositive=false")]
-    [TestCase("-1,1", 3, 1, false, ExpectedResult = true,
-        TestName = "number=-1,1; precision=3; scale=1; onlyPositive=false")]
-    [TestCase("+1", 2, 0, true, ExpectedResult = true,
-        TestName = "number+1; precision=2; scale=0; onlyPositive=true")]
-    [TestCase("+1.1", 3, 1, true, ExpectedResult = true,
-        TestName = "number+1.1; precision=3; scale=1; onlyPositive=true")]
-    [TestCase("+1,1", 3, 1, true, ExpectedResult = true,
-        TestName = "number+1,1; precision=3; scale=1; onlyPositive=true")]
+    [TestCase("0", 1, 0, true, ExpectedResult = true)]
+    [TestCase("0.1", 2, 1, true, ExpectedResult = true)]
+    [TestCase("0,1", 2, 1, true, ExpectedResult = true)]
+    [TestCase("-1", 2, 0, false, ExpectedResult = true)]
+    [TestCase("-1.1", 3, 1, false, ExpectedResult = true)]
+    [TestCase("-1,1", 3, 1, false, ExpectedResult = true)]
+    [TestCase("+1", 2, 0, true, ExpectedResult = true)]
+    [TestCase("+1.1", 3, 1, true, ExpectedResult = true)]
+    [TestCase("+1,1", 3, 1, true, ExpectedResult = true)]
     
-    [TestCase("", 2, 1, true, ExpectedResult = false,
-        TestName = "number=\"\"; precision=2; scale=1; onlyPositive=true")]
-    [TestCase(".0", 2, 1, true, ExpectedResult = false,
-        TestName = "number=.0; precision=2; scale=1; onlyPositive=true")]
-    [TestCase("0.", 2, 1, true, ExpectedResult = false,
-        TestName = "number=0.; precision=2; scale=1; onlyPositive=true")]
-    [TestCase("-1", 2, 0, true, ExpectedResult = false,
-        TestName = "number=-1; precision=2; scale=0; onlyPositive=true" )]
-    [TestCase("a.a", 2, 1, true, ExpectedResult = false,
-        TestName = "number=a.a; precision=2; scale=1; onlyPositive=true")]
-    [TestCase("1.1.1", 3, 2, true, ExpectedResult = false,
-        TestName = "number=1.1.1; precision=3; scale=2; onlyPositive=true")]
-    [TestCase("23,1", 2, 1, true, ExpectedResult = false,
-        TestName = "number=23,1; precision=2; scale=1; onlyPositive=true")]
-    [TestCase("23,1", 3, 0, true, ExpectedResult = false,
-        TestName = "number=23,1; precision=3; scale=0; onlyPositive=true")]
+    [TestCase("", 2, 1, true, ExpectedResult = false)]
+    [TestCase(".0", 2, 1, true, ExpectedResult = false)]
+    [TestCase("0.", 2, 1, true, ExpectedResult = false)]
+    [TestCase("-1", 2, 0, true, ExpectedResult = false)]
+    [TestCase("a.a", 2, 1, true, ExpectedResult = false)]
+    [TestCase("1.1.1", 3, 2, true, ExpectedResult = false)]
+    [TestCase("23,1", 2, 1, true, ExpectedResult = false)]
+    [TestCase("23,1", 3, 0, true, ExpectedResult = false)]
     public bool IsValid(string number, int precision, int scale, bool onlyPositive)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(number);
