@@ -1,6 +1,7 @@
 ﻿namespace TDD.Task;
 public class Game
 {
+    private int score = 0;
     public void Roll(int pins)
     {
         throw new NotImplementedException();
@@ -8,7 +9,7 @@ public class Game
 
     public int GetScore()
     {
-        throw new NotImplementedException();
+        return score;
     }
 }
 
