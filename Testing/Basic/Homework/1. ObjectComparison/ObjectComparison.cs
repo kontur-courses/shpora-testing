@@ -8,93 +8,18 @@ public class ObjectComparison
 {
     private static Person ExpectedTsar() => new Person("Ivan IV The Terrible", 54, 170, 70,
         new Person("Vasili III of Russia", 28, 170, 60, null));
-    
-    [Test]
-    [Description("Проверка имени текущего царя")]
-    public void CheckCurrentTsarName()
-    {
-        var actualTsarName = TsarRegistry.GetCurrentTsar().Name;
-
-        actualTsarName.Should().Be(ExpectedTsar().Name);
-    }
 
     [Test]
-    [Description("Проверка возраста текущего царя")]
-    public void CheckCurrentTsarAge()
+    [Description("Проверка текущего царя")]
+
+    public void CheckCurrentTsar()
     {
-        var actualTsarAge = TsarRegistry.GetCurrentTsar().Age;
+        var actualTsar = TsarRegistry.GetCurrentTsar();
 
-        actualTsarAge.Should().Be(ExpectedTsar().Age);
+        actualTsar.Should().BeEquivalentTo(ExpectedTsar(), options => options
+            .AllowingInfiniteRecursion()
+            .Excluding(o => o.Path.EndsWith("Id")));
     }
-
-    [Test]
-    [Description("Проверка роста текущего царя")]
-    public void CheckCurrentTsarHeight()
-    {
-        var actualTsarHeight = TsarRegistry.GetCurrentTsar().Height;
-
-        actualTsarHeight.Should().Be(ExpectedTsar().Height);
-    }
-
-    [Test]
-    [Description("Проверка веса текущего царя")]
-    public void CheckCurrentTsarWeight()
-    {
-        var actualTsarWeight = TsarRegistry.GetCurrentTsar().Weight;
-
-        actualTsarWeight.Should().Be(ExpectedTsar().Weight);
-    }
-
-    [Test]
-    [Description("Проверка имени родителя текущего царя")]
-
-    public void CheckCurrentTsarParentName()
-    {
-        var actualTsarParentName = TsarRegistry.GetCurrentTsar().Parent.Name;
-
-        actualTsarParentName.Should().Be(ExpectedTsar().Parent.Name);
-    }
-
-    [Test]
-    [Description("Проверка возраста родителя текущего царя")]
-
-    public void CheckCurrentTsarParentAge()
-    {
-        var actualTsarParentAge = TsarRegistry.GetCurrentTsar().Parent.Age;
-
-        actualTsarParentAge.Should().Be(ExpectedTsar().Parent.Age);
-    }
-
-    [Test]
-    [Description("Проверка роста родителя текущего царя")]
-
-    public void CheckCurrentTsarParentHeight()
-    {
-        var actualTsarParentHeight = TsarRegistry.GetCurrentTsar().Parent.Height;
-
-        actualTsarParentHeight.Should().Be(ExpectedTsar().Parent.Height);
-    }
-
-    [Test]
-    [Description("Проверка веса родителя текущего царя")]
-
-    public void CheckCurrentTsarParentWeight()
-    {
-        var actualTsarParentWeight = TsarRegistry.GetCurrentTsar().Parent.Weight;
-
-        actualTsarParentWeight.Should().Be(ExpectedTsar().Parent.Weight);
-    }
-
-    [Test]
-    [Description("Проверка деда/бабки текущего царя")]
-
-    public void CheckCurrentTsarParentParent()
-    {
-        var actualTsarParentParent = TsarRegistry.GetCurrentTsar().Parent.Parent;
-
-        actualTsarParentParent.Should().Be(ExpectedTsar().Parent.Parent);
-    }
-
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
