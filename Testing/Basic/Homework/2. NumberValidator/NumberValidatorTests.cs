@@ -57,8 +57,7 @@ public class NumberValidatorTests
 
         actual.Should().BeFalse();
     }
-
-    [Test]
+    
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("    ")]
@@ -70,8 +69,7 @@ public class NumberValidatorTests
         
         actual.Should().BeFalse();
     }
-
-    [Test]
+    
     [TestCase("a.sd")]
     [TestCase("0.")]
     [TestCase(",0")]
@@ -85,8 +83,7 @@ public class NumberValidatorTests
         
         actual.Should().BeFalse();
     }
-
-    [Test]
+    
     [TestCase("1,234")]
     [TestCase("1111")]
     [TestCase("22,32")]
@@ -113,7 +110,6 @@ public class NumberValidatorTests
         actual.Should().BeFalse();
     }
     
-    [Test]
     [TestCase("-0,0")]
     [TestCase("-0,000")]
     [TestCase("-0")]
@@ -126,7 +122,6 @@ public class NumberValidatorTests
         actual.Should().BeFalse();
     }
     
-    [Test]
     [TestCase("-0,0")]
     [TestCase("-0,000")]
     [TestCase("-0")]
@@ -138,8 +133,7 @@ public class NumberValidatorTests
         
         actual.Should().BeTrue();
     }
-
-    [Test]
+    
     [TestCase("0.0")]
     [TestCase("0")]
     [TestCase("+1.23")]
