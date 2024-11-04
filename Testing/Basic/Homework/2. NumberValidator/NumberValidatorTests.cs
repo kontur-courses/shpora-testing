@@ -26,7 +26,7 @@ public class NumberValidatorTests
 
     private void ShouldThrowExceptionWhenCreating(int precision, int scale)
     {
-        var builder = new TestNumberValidatorBuilder().WithScale(scale).WithPrecision(precision);
+        var builder = new TestNumberValidatorBuilder().WithPrecisionAndScale(precision, scale);
         
         Assert.Throws<ArgumentException>(() => builder.Build());
     }
@@ -47,7 +47,7 @@ public class NumberValidatorTests
     [TestCase(" ")]
     [TestCase("    ")]
     public void IsValidNumber_Should_Return_False_If_Value_Is_Empty(string value) => 
-        IsValidNumberShouldReturnFalse(value, 10, 5, true);
+        IsValidNumberShouldReturnFalse(value, 10, 5);
     
     [TestCase("a.sd")]
     [TestCase("0.")]
@@ -79,8 +79,7 @@ public class NumberValidatorTests
     private void IsValidNumberShouldReturnFalse(string value, int precision, int scale, bool onlyPositive = true)
     {
         var numberValidator = new TestNumberValidatorBuilder()
-            .WithPrecision(precision)
-            .WithScale(scale)
+            .WithPrecisionAndScale(precision, scale)
             .WithOnlyPositive(onlyPositive)
             .Build();
         
