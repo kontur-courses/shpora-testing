@@ -40,40 +40,22 @@ public class NumberValidatorTests
     }
 
     [Test]
-    public void IsValidNumber_Should_Return_False_If_Value_Is_Null()
-    {
-        var numberValidator = new TestNumberValidatorBuilder().Build();
-        
-        var actual = numberValidator.IsValidNumber(null);
-
-        actual.Should().BeFalse();
-    }
+    public void IsValidNumber_Should_Return_False_If_Value_Is_Null() =>
+        IsValidNumberShouldReturnFalse(null!, 10, 5);
     
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("    ")]
-    public void IsValidNumber_Should_Return_False_If_Value_Is_Empty(string value)
-    {
-        var numberValidator = new TestNumberValidatorBuilder().Build();
-        
-        var actual = numberValidator.IsValidNumber(value);
-        
-        actual.Should().BeFalse();
-    }
+    public void IsValidNumber_Should_Return_False_If_Value_Is_Empty(string value) => 
+        IsValidNumberShouldReturnFalse(value, 10, 5, true);
     
     [TestCase("a.sd")]
     [TestCase("0.")]
     [TestCase(",0")]
     [TestCase("0*0")]
     [TestCase("!0,0")]
-    public void IsValidNumber_Should_Return_False_If_Match_With_Value_Fail(string value)
-    {
-        var numberValidator = new TestNumberValidatorBuilder().Build();
-        
-        var actual = numberValidator.IsValidNumber(value);
-        
-        actual.Should().BeFalse();
-    }
+    public void IsValidNumber_Should_Return_False_If_Match_With_Value_Fail(string value) => 
+        IsValidNumberShouldReturnFalse(value, 10, 5);
     
     [TestCase("1,234")]
     [TestCase("1111")]
@@ -81,32 +63,26 @@ public class NumberValidatorTests
     [TestCase("+1,23")]
     [TestCase("+0,00")]
     [TestCase("-0,00")]
-    public void IsValidNumber_Should_Return_False_If_Sum_Of_IntPart_And_FracPart_More_Than_Precision(string value)
-    {
-        var numberValidator = new TestNumberValidatorBuilder().WithPrecision(3).WithScale(2).Build();
-        
-        var actual = numberValidator.IsValidNumber(value);
-        
-        actual.Should().BeFalse();
-    }
-    
+    public void IsValidNumber_Should_Return_False_If_Sum_Of_IntPart_And_FracPart_More_Than_Precision(string value) => 
+        IsValidNumberShouldReturnFalse(value, 3, 2);
+
     [Test]
-    public void IsValidNumber_Should_Return_False_If_FracPart_More_Than_Scale()
-    {
-        var numberValidator = new TestNumberValidatorBuilder().WithScale(2).Build();
-        var value = "0,000";
-        
-        var actual = numberValidator.IsValidNumber(value);
-        
-        actual.Should().BeFalse();
-    }
+    public void IsValidNumber_Should_Return_False_If_FracPart_More_Than_Scale() =>
+        IsValidNumberShouldReturnFalse("0,000", 10, 2);
     
     [TestCase("-0,0")]
     [TestCase("-0,000")]
     [TestCase("-0")]
-    public void IsValidNumber_Should_Return_False_If_OnlyPositive_True_And_Value_Contains_Minus(string value)
+    public void IsValidNumber_Should_Return_False_If_OnlyPositive_True_And_Value_Contains_Minus(string value) => 
+        IsValidNumberShouldReturnFalse(value, 10, 5);
+
+    private void IsValidNumberShouldReturnFalse(string value, int precision, int scale, bool onlyPositive = true)
     {
-        var numberValidator = new TestNumberValidatorBuilder().Build();
+        var numberValidator = new TestNumberValidatorBuilder()
+            .WithPrecision(precision)
+            .WithScale(scale)
+            .WithOnlyPositive(onlyPositive)
+            .Build();
         
         var actual = numberValidator.IsValidNumber(value);
         
