@@ -1,12 +1,13 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
     [Test]
     [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
@@ -14,16 +15,13 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar
+            .Should()
+            .BeEquivalentTo(expectedTsar, options =>
+                options
+                    .AllowingInfiniteRecursion()
+                    .Excluding(o => o.Id)
+                    .Excluding(o => o.Parent.Id));
     }
 
     [Test]
@@ -35,6 +33,12 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        // При изменении класса Person придётся изменять метод AreEqual,
+        // т.е. если мы добавим поле в Person, то придётся добавить проверку на него в этом методе.
+        // При провале теста мы не получаем конкретной информации из-за чего тест не прошёл,
+        // т.к. метод AreEqual возвращает bool и скажет нам только Success или Failed.
+        // Невозможно сравнить двух Person без определённых полей,
+        // придётся создавать различные реализации метода AreEqual.
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
