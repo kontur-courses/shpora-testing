@@ -9,33 +9,24 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
     [Test]
-    public void Should_Throw_ArgumentException_If_Precision_Is_Negative()
-    {
-        var builder = new TestNumberValidatorBuilder().WithPrecision(-1);
-        
-        Assert.Throws<ArgumentException>(() => builder.Build());
-    }
-    
+    public void Should_Throw_ArgumentException_If_Precision_Is_Negative() =>
+        ShouldThrowExceptionWhenCreating(-1, 5);
+
     [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Is_Negative()
-    {
-        var builder = new TestNumberValidatorBuilder().WithScale(-1);
-        
-        Assert.Throws<ArgumentException>(() => builder.Build());
-    }
-    
+    public void Should_Throw_ArgumentException_If_Scale_Is_Negative() =>
+        ShouldThrowExceptionWhenCreating(5, -1);
+
     [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Greater_Precision()
-    {
-        var builder = new TestNumberValidatorBuilder().WithScale(5).WithPrecision(2);
-        
-        Assert.Throws<ArgumentException>(() => builder.Build());
-    }
-    
+    public void Should_Throw_ArgumentException_If_Scale_Greater_Precision() =>
+        ShouldThrowExceptionWhenCreating(2, 5);
+
     [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Equal_Precision()
+    public void Should_Throw_ArgumentException_If_Scale_Equal_Precision() =>
+        ShouldThrowExceptionWhenCreating(2, 2);
+
+    private void ShouldThrowExceptionWhenCreating(int precision, int scale)
     {
-        var builder = new TestNumberValidatorBuilder().WithScale(2).WithPrecision(2);
+        var builder = new TestNumberValidatorBuilder().WithScale(scale).WithPrecision(precision);
         
         Assert.Throws<ArgumentException>(() => builder.Build());
     }
