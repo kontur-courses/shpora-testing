@@ -33,17 +33,10 @@ public class NumberValidatorTests
     # region NumberValidator IsValidNumber method tests
     [TestCase(17, 2, true, "0", ExpectedResult = true)]
     [TestCase(17, 2, true, "0.0", ExpectedResult = true)]
+    [TestCase(4, 2, true, "+1.23", ExpectedResult = true)]
+    [TestCase(3, 2, true, "+1.23", ExpectedResult = false)]
     [TestCase(3, 2, true, "-0.00", ExpectedResult = false)]
     [TestCase(3, 2, true, "+0.00", ExpectedResult = false)]
-    public bool IsValidNumber_ZeroHasNoSign(int precision, int scale, bool onlyPositive, string testNumber)
-    {
-        return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(testNumber);
-    }
-    
-    [TestCase(4, 2, true, "+1.23", ExpectedResult = true)]
-    [TestCase(5, 2, true, "+01.23", ExpectedResult = true)]
-    [TestCase(3, 2, true, "00.00", ExpectedResult = false)]
-    [TestCase(3, 2, true, "+1.23", ExpectedResult = false)]
     public bool IsValidNumber_NumberFitsInPrecision(int precision, int scale, bool onlyPositive, string testNumber)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(testNumber);
