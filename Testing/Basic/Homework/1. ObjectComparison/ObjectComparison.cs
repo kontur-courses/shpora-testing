@@ -1,30 +1,39 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
+    private Person actualTsar;
+
+    [SetUp]
+    [Description("Получение экземпляра текущего царя")]
+    public void SetUp()
+    {
+        actualTsar = TsarRegistry.GetCurrentTsar();
+    }
+
     [Test]
     [Description("Проверка текущего царя")]
     [Category("ToRefactor")]
     public void CheckCurrentTsar()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
-
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar,
+            ExcludeIdFromPersonClass);
     }
+
+    private EquivalencyAssertionOptions<Person> ExcludeIdFromPersonClass(
+        EquivalencyAssertionOptions<Person> congiguration)
+        => congiguration
+            .Excluding(member =>
+                member.DeclaringType == typeof(Person)
+                && member.Name.Equals(nameof(Person.Id)));
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
@@ -34,7 +43,15 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        /* Какие недостатки у такого подхода?
+
+        Основным недостатком данного подхода я считаю необходимость
+        изменения метода AreEqual при добавлении новых полей класса Person.
+        Например, если мы добавим в Person поле Gender(пол),
+        то нам нужно будет в AreEqual так же ручками добавить
+        проверку совпадения полов:
+        actual.Gender == expected.Gender.
+        */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
