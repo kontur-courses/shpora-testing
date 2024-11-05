@@ -8,6 +8,9 @@ public class NumberValidatorTests
 {
     #region Constructor
 
+    private const string PRECISION_VALIDATION_EXCEPTION_MESSAGE = "precision must be a positive number";
+    private const string SCALE_VALIDATION_EXCEPTION_MESSAGE = "precision must be a non-negative number less or equal than precision";
+
     [Test]
     public void Constructor_ThrowArgumentException_PrecisionIsZero()
     {
@@ -15,7 +18,7 @@ public class NumberValidatorTests
 
         act.Should()
             .Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
+            .WithMessage(PRECISION_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     [Test]
@@ -25,7 +28,7 @@ public class NumberValidatorTests
 
         act.Should()
             .Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
+            .WithMessage(PRECISION_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     [Test]
@@ -35,7 +38,7 @@ public class NumberValidatorTests
 
         act.Should()
             .Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
+            .WithMessage(SCALE_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     [Test]
@@ -45,7 +48,7 @@ public class NumberValidatorTests
 
         act.Should()
             .Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
+            .WithMessage(SCALE_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     [Test]
@@ -55,7 +58,7 @@ public class NumberValidatorTests
 
         act.Should()
             .Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
+            .WithMessage(SCALE_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     [Test]
@@ -71,42 +74,42 @@ public class NumberValidatorTests
 
     #region IsValidNumber
 
-    [Test]
-    public void IsValidNumber_ReturnFalse_ValueIsNullOrEmpty()
+    [TestCase(null)]
+    [TestCase("")]
+    public void IsValidNumber_ReturnFalse_ValueIsNullOrEmpty(string value)
     {
         var validator = new NumberValidator(3, 2);
 
-        validator.IsValidNumber(null).Should().BeFalse();
-        validator.IsValidNumber("").Should().BeFalse();
+        validator.IsValidNumber(value).Should().BeFalse();
     }
 
-    [Test]
-    public void IsValidNumber_ReturnFalse_RegexNotMatched()
+    [TestCase("a.sd")]
+    [TestCase("3,3.3")]
+    [TestCase("3..3")]
+    public void IsValidNumber_ReturnFalse_RegexNotMatched(string value)
     {
         var validator = new NumberValidator(3, 2);
 
-        validator.IsValidNumber("a.sd").Should().BeFalse();
-        validator.IsValidNumber("3,3.3").Should().BeFalse();
-        validator.IsValidNumber("3..3").Should().BeFalse();
+        validator.IsValidNumber(value).Should().BeFalse();
     }
 
-    [Test]
-    public void IsValidNumber_ReturnTrue_PrecisionIsEqualOrLessThenValueLength()
+    [TestCase("1111")]
+    [TestCase("1")]
+    [TestCase("+111")]
+    public void IsValidNumber_ReturnTrue_PrecisionIsEqualOrLessThenValueLength(string value)
     {
         var validator = new NumberValidator(4);
 
-        validator.IsValidNumber("1111").Should().BeTrue();
-        validator.IsValidNumber("1").Should().BeTrue();
-        validator.IsValidNumber("+111").Should().BeTrue();
+        validator.IsValidNumber(value).Should().BeTrue();
     }
 
-    [Test]
-    public void IsValidNumber_ReturnFalse_ValueLengthIsGreaterThenPrecision()
+    [TestCase("1111")]
+    [TestCase("+111")]
+    public void IsValidNumber_ReturnFalse_ValueLengthIsGreaterThenPrecision(string value)
     {
         var validator = new NumberValidator(3);
 
-        validator.IsValidNumber("1111").Should().BeFalse();
-        validator.IsValidNumber("+111").Should().BeFalse();
+        validator.IsValidNumber(value).Should().BeFalse();
     }
 
     [Test]
@@ -117,14 +120,14 @@ public class NumberValidatorTests
         validator.IsValidNumber("1.111").Should().BeFalse();
     }
 
-    [Test]
-    public void IsValidNumber_ReturnTrue_ValueLengthIsEqualOrLessThenScale()
+    [TestCase("1.111")]
+    [TestCase("1.1")]
+    [TestCase("1")]
+    public void IsValidNumber_ReturnTrue_ValueLengthIsEqualOrLessThenScale(string value)
     {
         var validator = new NumberValidator(4, 3);
 
-        validator.IsValidNumber("1.111").Should().BeTrue();
-        validator.IsValidNumber("1.1").Should().BeTrue();
-        validator.IsValidNumber("1").Should().BeTrue();
+        validator.IsValidNumber(value).Should().BeTrue();
     }
 
     [Test]
@@ -135,13 +138,13 @@ public class NumberValidatorTests
         validator.IsValidNumber("-1.11").Should().BeFalse();
     }
 
-    [Test]
-    public void IsValidNumber_ReturnTrue_OnlyPositiveIsTrueWithPositiveValue()
+    [TestCase("1.11")]
+    [TestCase("+1.11")]
+    public void IsValidNumber_ReturnTrue_OnlyPositiveIsTrueWithPositiveValue(string value)
     {
         var validator = new NumberValidator(4, 2, true);
 
-        validator.IsValidNumber("1.11").Should().BeTrue();
-        validator.IsValidNumber("+1.11").Should().BeTrue();
+        validator.IsValidNumber(value).Should().BeTrue();
     }
 
     [Test] public void IsValidNumber_ReturnTrue_OnlyPositiveIsFalseWithNegativeValue()
