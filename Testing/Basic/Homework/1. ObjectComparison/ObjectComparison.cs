@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using Xunit.Internal;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
@@ -29,10 +32,10 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         /* Какие недостатки у такого подхода?
-             1) Много кода (отдельный метод для сравнения)
+             1) В метод можно передать только параметры класса Person, для других классов нужен будет новый метод.
              2) Плохая читаемость и выразительность в сравнении с использованием FluentAssertions
-             3) Плохая расширяемость (для добавления нового функционала необходимо писать новые методы)
-             4) Смена фреймворка приведет к необходимости переписывания теста
+             3) При расширении класса Person необходимо вносить изменения в метод AreEqual
+             4) Смена фреймворка (например c NUnit на XUnit) приведет к необходимости переписывания теста
              5) Зачем реализовывать то, что уже есть в FluentAssertions?
              Такой метод тяжело поддерживать.
          */
