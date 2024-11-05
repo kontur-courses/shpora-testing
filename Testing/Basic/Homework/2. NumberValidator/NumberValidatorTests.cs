@@ -12,23 +12,19 @@ public class NumberValidatorTests
     [Test]
     public void Test()
     {
-        //Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        //Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        //Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        //Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
+        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
 
         ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
         ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
         ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
+
+        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
         ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
         ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
         ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
+        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
+        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00")); 
     }
 
     [Test]
@@ -80,5 +76,111 @@ public class NumberValidatorTests
             .WithMessage("precision must be a non-negative number less or equal than precision");
     }
 
-    
+    [Test]
+    public void IsValidNumber_ReturnsTrue_WhenPrecisionAndScaleMoreThanValueIntAndFracParts()
+    {
+        var value = "0.0";
+        var numbValidator = new NumberValidator(17, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeTrue();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsTrue_WhenValueIsIntegerAndHasLessDigitsThanPrecision()
+    {
+        var value = "0";
+        var numbValidator = new NumberValidator(17, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeTrue();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsTrue_WhenLengthIntPartAndFracPartEqualToPrecision_IncludingNumberSign()
+    {
+        var value = "+1.23";
+        var numbValidator = new NumberValidator(4, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeTrue();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForPositiveNumber()
+    {
+        var value = "+1.23";
+        var numbValidator = new NumberValidator(3, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForNegativeNumber()
+    {
+        var value = "-1.23";
+        var numbValidator = new NumberValidator(3, 2, false);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenValueFracPartMoreThanScale()
+    {
+        var value = "0.000";
+        var numbValidator = new NumberValidator(17, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenValueContainsNonDigitSymbols()
+    {
+        var value = "a.sd";
+        var numbValidator = new NumberValidator(3, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenValueSymbolsCountMoreThanPrecision()
+    {
+        var value = "00.00";
+        var numbValidator = new NumberValidator(3, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
+
+    [Test]
+    public void IsValidNumber_ReturnsFalse_WhenValueNegative_WithOnlyPositiveNumberValidator()
+    {
+        var value = "-0.00";
+        var numbValidator = new NumberValidator(4, 2, true);
+
+        var isValid = numbValidator.IsValidNumber(value);
+
+        isValid
+            .Should().BeFalse();
+    }
 }
