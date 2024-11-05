@@ -16,8 +16,7 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
         actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
             .IncludingNestedObjects()
-            .Excluding(p => p.Id)
-            .Excluding(p => p.Parent.Id));
+            .Excluding(p => p.Path.Contains("Id")));
         //+Проверяет все поля класса на эквивалентность
         //+При добавлении нового поля в класс проверка будет автоматически включена
         //+Уменьшено количество кода
@@ -38,6 +37,9 @@ public class ObjectComparison
         //-При появлении новых полей придется переписывать тест
         //-Функция возвращает bool, что не информативно
         //-Для того чтобы узнать различия между царями придется дебажить и проверять каждое условие
+        //-Используется рекурсивный подход без явно заданного ограничения на рекурсию
+        //-В IncludingNestedObjects макс глубина рекурсии по умолчанию 10
+        //-Что не даст уйти сильно в дебри
     }
 
     private bool AreEqual(Person? actual, Person? expected)
