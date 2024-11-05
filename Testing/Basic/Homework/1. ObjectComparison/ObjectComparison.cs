@@ -1,9 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
-using Xunit.Internal;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
