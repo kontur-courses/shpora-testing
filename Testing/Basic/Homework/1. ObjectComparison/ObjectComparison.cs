@@ -17,7 +17,7 @@ public class ObjectComparison
 
         actualTsar.Should().BeEquivalentTo(expectedTsar,
             options => options
-                .Excluding(tsar => tsar.Path.EndsWith("Id")));
+                .Excluding(memberInfo => memberInfo.Name == nameof(Person.Id) && memberInfo.DeclaringType == typeof(Person)));
     }
 
     [Test]
