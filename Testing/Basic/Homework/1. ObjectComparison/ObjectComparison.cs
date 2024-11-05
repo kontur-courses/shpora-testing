@@ -1,8 +1,9 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
-using FluentAssertions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
     [Test]
@@ -13,7 +14,7 @@ public class ObjectComparison
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-           new Person("Vasili III of Russia", 28, 170, 60, null));
+            new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
 
@@ -36,7 +37,7 @@ public class ObjectComparison
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-             new Person("Vasili III of Russia", 28, 170, 60, null));
+            new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода?
         // 1. Не очевидно, где произошло несовпадение в случае падения теста.
