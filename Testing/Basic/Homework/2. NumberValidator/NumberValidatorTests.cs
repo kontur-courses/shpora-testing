@@ -1,34 +1,11 @@
-﻿
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
-using System;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void NumberValidator_WhenPrecisionIsNegative_Fails()
-    {
-        Action act = () => new NumberValidator(-1, 2, false);
-
-        act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
-    }
-
-    [Test]
-    public void NumberValidator_WhenPrecisionIsZero_Fails()
-    {
-        Action act = () => new NumberValidator(0, 2, false);
-
-        act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
-    }
-
     [Test]
     public void NumberValidator_WhenScaleIsZero_NotFails()
     {
@@ -39,9 +16,29 @@ public class NumberValidatorTests
     }
 
     [Test]
+    public void NumberValidator_WhenPrecisionIsNegative_Fails()
+    {
+        Action act = () => new NumberValidator(-1, 2);
+
+        act
+            .Should().Throw<ArgumentException>()
+            .WithMessage("precision must be a positive number");
+    }
+
+    [Test]
+    public void NumberValidator_WhenPrecisionIsZero_Fails()
+    {
+        Action act = () => new NumberValidator(0, 2);
+
+        act
+            .Should().Throw<ArgumentException>()
+            .WithMessage("precision must be a positive number");
+    }
+
+    [Test]
     public void NumberValidator_WhenScaleIsNegative_Fails()
     {
-        Action act = () => new NumberValidator(1, -1, false);
+        Action act = () => new NumberValidator(1, -1);
 
         act
             .Should().Throw<ArgumentException>()
@@ -51,7 +48,7 @@ public class NumberValidatorTests
     [Test]
     public void NumberValidator_WhenPrecisionLessThanScale_Fails()
     {
-        Action act = () => new NumberValidator(1, 2, false);
+        Action act = () => new NumberValidator(1, 2);
 
         act
             .Should().Throw<ArgumentException>()
@@ -62,33 +59,32 @@ public class NumberValidatorTests
     public void IsValidNumber_ReturnsTrue_WhenPrecisionAndScaleMoreThanValueIntAndFracParts()
     {
         var value = "0.0";
-        var numbValidator = new NumberValidator(17, 2, true);
+        var validator = new NumberValidator(17, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeTrue();
+        IsValidNumber_ReturnsTrue(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsTrue_WhenValueIsIntegerAndHasLessDigitsThanPrecision()
     {
         var value = "0";
-        var numbValidator = new NumberValidator(17, 2, true);
+        var validator = new NumberValidator(17, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeTrue();
+        IsValidNumber_ReturnsTrue(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsTrue_WhenLengthIntPartAndFracPartEqualToPrecision_IncludingNumberSign()
     {
         var value = "+1.23";
-        var numbValidator = new NumberValidator(4, 2, true);
+        var validator = new NumberValidator(4, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
+        IsValidNumber_ReturnsTrue(value, validator);
+    }
+
+    private void IsValidNumber_ReturnsTrue(string value, NumberValidator validator)
+    {
+        var isValid = validator.IsValidNumber(value);
 
         isValid
             .Should().BeTrue();
@@ -98,69 +94,59 @@ public class NumberValidatorTests
     public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForPositiveNumber()
     {
         var value = "+1.23";
-        var numbValidator = new NumberValidator(3, 2, true);
+        var validator = new NumberValidator(3, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeFalse();
+        IsValidNumber_ReturnsFalse(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForNegativeNumber()
     {
         var value = "-1.23";
-        var numbValidator = new NumberValidator(3, 2, false);
+        var validator = new NumberValidator(3, 2);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeFalse();
+        IsValidNumber_ReturnsFalse(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueFracPartMoreThanScale()
     {
         var value = "0.000";
-        var numbValidator = new NumberValidator(17, 2, true);
+        var validator = new NumberValidator(17, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeFalse();
+        IsValidNumber_ReturnsFalse(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueContainsNonDigitSymbols()
     {
         var value = "a.sd";
-        var numbValidator = new NumberValidator(3, 2, true);
+        var validator = new NumberValidator(3, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeFalse();
+        IsValidNumber_ReturnsFalse(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueSymbolsCountMoreThanPrecision()
     {
         var value = "00.00";
-        var numbValidator = new NumberValidator(3, 2, true);
+        var validator = new NumberValidator(3, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
-
-        isValid
-            .Should().BeFalse();
+        IsValidNumber_ReturnsFalse(value, validator);
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueNegative_WithOnlyPositiveNumberValidator()
     {
         var value = "-0.00";
-        var numbValidator = new NumberValidator(4, 2, true);
+        var validator = new NumberValidator(4, 2, true);
 
-        var isValid = numbValidator.IsValidNumber(value);
+        IsValidNumber_ReturnsFalse(value, validator);
+    }
+
+    private void IsValidNumber_ReturnsFalse(string value, NumberValidator validator)
+    {
+        var isValid = validator.IsValidNumber(value);
 
         isValid
             .Should().BeFalse();
