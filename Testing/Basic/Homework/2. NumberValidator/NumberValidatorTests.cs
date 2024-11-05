@@ -50,7 +50,7 @@ public class NumberValidatorShould
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
     }
 
-    public static IEnumerable IsValidTestCases
+    private static IEnumerable IsValidTestCases
     {
         get
         {
