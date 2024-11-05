@@ -1,91 +1,72 @@
 ﻿using NUnit.Framework;
 using FluentAssertions;
+using System.Collections;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-2, 2, true)]
-    [TestCase(-2, 2, false)]
-    public void Constructor_ShouldThrowArgumentException_WhenPrecisionIsNegative(
-        int precision, int scale, bool onlyPositive)
+    [TestCase(-2, 2, true, TestName = "WhenPrecisionIsNegativeOnlyPositive")]
+    [TestCase(-2, 2, false, TestName = "WhenPrecisionIsNegative")]
+    [TestCase(1, 2, true, TestName = "WhenScaleGreaterThanPrecisionOnlyPositive")]
+    [TestCase(1, 2, false, TestName = "WhenScaleGreaterThanPrecision")]
+    [TestCase(2, -1, true, TestName = "WhenScaleIsLessThatZeroOnlyPositive")]
+    [TestCase(2, -1, false, TestName = "WhenScaleIsLessThatZero")]
+    [TestCase(2, 2, true, TestName = "WhenScaleEqualPrecisionOnlyPositive")]
+    [TestCase(2, 2, false, TestName = "WhenScaleEqualPrecision")]
+
+    public void Constructor_ShouldThrowArgumentException(int precision, int scale, bool onlyPositive)
     {
         var act = () => new NumberValidator(precision, scale, onlyPositive);
+
         act.Should().Throw<ArgumentException>();
     }
 
-    [TestCase(1, 2, true)]
-    [TestCase(1, 2, false)]
-    public void Constructor_ShouldThrowArgumentException_WhenScaleGreaterThanPrecision(int precision, int scale, bool onlyPositive)
-    {
-        var act = () => new NumberValidator(precision, scale, onlyPositive);
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [TestCase(2, -1, true)]
-    [TestCase(2, -1, false)]
-    public void Constructor_ShouldThrowArgumentException_WhenScaleIsLessThatZero(int precision, int scale, bool onlyPositive)
-    {
-        var act = () => new NumberValidator(precision, scale, onlyPositive);
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [TestCase(2, 2, true)]
-    [TestCase(2, 2, false)]
-    public void NumberValidator_ShouldThrowArgumentException_WhenScaleEqualPrecision(int precision, int scale, bool onlyPositive)
-    {
-        var act = () => new NumberValidator(precision, scale, onlyPositive);
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [TestCase(1, 0, true)]
-    [TestCase(1, 0, false)]
-    public void Constructor_ShouldNotThrow_WithValidParameters(
-        int precision, int scale, bool onlyPositive)
-    {
-        var act = () => new NumberValidator(precision, scale, onlyPositive);
-        act.Should().NotThrow();
-    }
-
-    [TestCase("0.0", 15, 2, true, true, TestName = "Simple decimal")]
-    [TestCase("0", 15, 2, true, true, TestName = "Integer only")]
-    [TestCase("00.00", 3, 2, true, false, TestName = "Leading zeros - invalid")]
-    [TestCase("-0.00", 3, 2, true, false, TestName = "Negative zero - invalid")]
-    [TestCase("+0.00", 3, 2, true, false, TestName = "Positive zero with sign - invalid")]
-    [TestCase("+1.23", 4, 2, true, true, TestName = "Positive number with sign - valid length")]
-    [TestCase("+1.23", 3, 2, true, false, TestName = "Positive number with sign - invalid length")]
-    [TestCase("0.000", 15, 2, true, false, TestName = "Too many fractional digits")]
-    [TestCase("-1.23", 3, 2, false, false, TestName = "Negative number - invalid length")]
-    [TestCase("-1.23", 4, 2, true, false, TestName = "Negative number - not allowed")]
-    [TestCase("a.sd", 3, 2, true, false, TestName = "Non-numeric input")]
-    [TestCase("", 2, 1, true, false, TestName = "Empty input")]
+    [TestCaseSource(nameof(ValidNumbersCases_ReturnTrue))]
+    [TestCaseSource(nameof(InalidNumberCases_ReturnFalse))]
     public void IsValidNumber_ShouldValidateCorrectly(
-        string number,
+        string input,
         int precision,
         int scale,
         bool onlyPositive,
         bool expectedResult)
     {
-
         var validator = new NumberValidator(precision, scale, onlyPositive);
-        var result = validator.IsValidNumber(number);
+        
+        var result = validator.IsValidNumber(input);
+        
         result.Should().Be(expectedResult);
     }
 
-    [TestCase(".123", 4, 2, true, false, TestName = "Missing leading zero")]
-    [TestCase("1.", 4, 2, true, false, TestName = "Missing trailing digits")]
-    [TestCase("999.99", 4, 2, true, false, TestName = "Exceeding total digits")]
-    [TestCase("1,23", 4, 2, true, true, TestName = "Another decimal separator")]
-    public void IsValidNumber_AdditionalCases(
-        string number,
-        int precision,
-        int scale,
-        bool onlyPositive,
-        bool expectedResult)
+    private static IEnumerable ValidNumbersCases_ReturnTrue
     {
-        var validator = new NumberValidator(precision, scale, onlyPositive);
-        var result = validator.IsValidNumber(number);
-        result.Should().Be(expectedResult);
+        get
+        {
+            yield return new TestCaseData("0.0", 15, 2, true, true).SetName("Decimal");
+            yield return new TestCaseData("0", 15, 2, true, true).SetName("Integer");
+            yield return new TestCaseData("1,23", 4, 2, true, true).SetName("AnotherDecimalSeparator");
+            yield return new TestCaseData("+1.23", 4, 2, true, true).SetName("PositiveNumberWithSignValidLenght");
+        }
+    }
+
+    private static IEnumerable InalidNumberCases_ReturnFalse
+    {
+        get
+        {
+            yield return new TestCaseData("00.00", 3, 2, true, false).SetName("LeadingZeros");
+            yield return new TestCaseData("-0.00", 3, 2, true, false).SetName("NegativeZero");
+            yield return new TestCaseData("+0.00", 3, 2, true, false).SetName("PositiveZeroWithSignInvalidLength");
+            yield return new TestCaseData("+1.23", 3, 2, true, false).SetName("PositiveNumberWithSignInvalidLength");
+            yield return new TestCaseData("0.000", 15, 2, true, false).SetName("MoreFractionalDigitsThenExpected");
+            yield return new TestCaseData("-1.23", 3, 2, false, false).SetName("NegativeNumberInvalidLength");
+            yield return new TestCaseData("-1.23", 4, 2, true, false).SetName("NegativeNumberNotAllowed");
+            yield return new TestCaseData("a.sd", 3, 2, true, false).SetName("NonnumericInput");
+            yield return new TestCaseData("", 2, 1, true, false).SetName("EmptyInput");
+            yield return new TestCaseData(".123", 4, 2, true, false).SetName("MissingLeadingZero");
+            yield return new TestCaseData("1.", 4, 2, true, false).SetName("MissingTrailingDigits");
+            yield return new TestCaseData("999.99", 4, 2, true, false).SetName("ExceedingTotalDigits");
+        }
     }
 }

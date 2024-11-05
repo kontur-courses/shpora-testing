@@ -15,8 +15,9 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
+        //Вот какой функцией можно заменить выражение Func<IMemberInfo, bool> excludePersonId = tsar => tsar.DeclaringType == typeof(Person) && tsar.Name == nameof(Person.Id);
         actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
-                options.Excluding(tsar => tsar.DeclaringType == typeof(Person) && tsar.Path.EndsWith("Id")));
+                options.Excluding(tsar => tsar.DeclaringType == typeof(Person) && tsar.Name == nameof(Person.Id)));
     }
 
     [Test]
