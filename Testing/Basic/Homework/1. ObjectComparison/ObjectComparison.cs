@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +18,24 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        //В отличие от решения в методе CheckCurrentTsar_WithCustomEquality
+        //Обладает следующими преимуществами:
+        // 
+        //1. Лучшая расширширяемость. Необходимость изменения теста
+        //при изменении класса Person меньше
+        //
+        //2. Лучшая читаемость, ясно что делает и проверяет тест
+        //
+        //3. Сообщение об ошибке информативней
+        //
+        //Недостатки реализации - я произвел сравнения объектов вложенностью только до 1 Parent,
+        //если потребуется сравнения дальше по уровню вложенности Parent,
+        //то оно тут не выполняется, это недостаток
 
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
+            options.Excluding(p => p.Id)
+                .Excluding(p => p.Parent.Id)
+                .Excluding(p => p.Parent.Parent));
     }
 
     [Test]
@@ -34,7 +46,16 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        //Какие недостатки у такого подхода?
+        //
+        //1. При добавлении добавлении или изменении полей в
+        //классе Person необходимо будет также изменять метод
+        //AreEqual для сравнения объектов
+        //
+        //2. Сообщение об ошибке, не содержит в себе понятной
+        //информации по какой причине тесте не пройден.
+        //В отличии от аналогичного использования FluentAssertions
+
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
