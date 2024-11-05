@@ -1,31 +1,44 @@
 ﻿
+using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+using System.Collections;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
-public class NumberValidatorTests
+public partial class NumberValidatorTests
 {
-    [Test]
-    public void Test()
-    {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+	[TestCaseSource(nameof(ValidTestCases))]
+	public void Should_Be_Valid(int precision, int scale, bool onlyPositive, string value)
+	{
+		var validator = new NumberValidator(precision, scale, onlyPositive);
 
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
-    }
+		var result = validator.IsValidNumber(value);
+
+		result.Should().BeTrue();
+	}
+
+	[TestCaseSource(nameof(NotValidTestCases))]
+	public void Should_Be_NotValid(int precision, int scale, bool onlyPositive, string value)
+	{
+		var validator = new NumberValidator(precision, scale, onlyPositive);
+
+		var result = validator.IsValidNumber(value);
+
+		result.Should().BeFalse();
+	}
+
+	[TestCaseSource(nameof(ThrowArgumentExceptionTestCases))]
+	public void Should_ThrowArgumentException(int precision, int scale, bool onlyPositive)
+	{
+		var action = () => new NumberValidator(precision, scale, onlyPositive);
+		action.Should().Throw<ArgumentException>();
+	}
+
+	[TestCaseSource(nameof(NotThrowArgumentExceptionTestCases))]
+	public void Should_NotThrowArgumentException(int precision, int scale, bool onlyPositive)
+	{
+		var action = () => new NumberValidator(precision, scale, onlyPositive);
+		action.Should().NotThrow();
+	}
 }
