@@ -44,25 +44,6 @@ public class NumberValidatorShould
         }
     }
 
-    [TestCaseSource(nameof(ValidTestCases))]
-    public bool ReturnTrue_AfterCheckingValid(int precision, int scale, bool onlyPositive, string str)
-    {
-        return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
-    }
-
-    public static IEnumerable ValidTestCases
-    {
-        get
-        {
-            yield return new TestCaseData(17, 2, true, "0.0").Returns(true);
-            yield return new TestCaseData(17, 2, true, "11").Returns(true);
-            yield return new TestCaseData(17, 2, true, "0,0").Returns(true);
-            yield return new TestCaseData(17, 2, true, "0").Returns(true);
-            yield return new TestCaseData(4, 2, true, "+1.23").Returns(true);
-            yield return new TestCaseData(4, 2, false, "-1.23").Returns(true);
-        }
-    }
-
     [TestCaseSource(nameof(InvalidTestCases))]
     public bool ReturnFalse_AfterCheckingValid(int precision, int scale, bool onlyPositive, string str)
     {
@@ -85,6 +66,12 @@ public class NumberValidatorShould
             yield return new TestCaseData(17, 2, true, "0.000").Returns(false);
             yield return new TestCaseData(17, 2, true, "").Returns(false);
             yield return new TestCaseData(17, 2, true, null).Returns(false);
+            yield return new TestCaseData(17, 2, true, "0.0").Returns(true);
+            yield return new TestCaseData(17, 2, true, "11").Returns(true);
+            yield return new TestCaseData(17, 2, true, "0,0").Returns(true);
+            yield return new TestCaseData(17, 2, true, "0").Returns(true);
+            yield return new TestCaseData(4, 2, true, "+1.23").Returns(true);
+            yield return new TestCaseData(4, 2, false, "-1.23").Returns(true);
         }
     }
 }
