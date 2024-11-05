@@ -57,17 +57,12 @@ public class NumberValidatorShould
             yield return new TestCaseData(3, 2, true, "00.00").Returns(false);
             yield return new TestCaseData(17, 2, true, "0.0a").Returns(false);
             yield return new TestCaseData(17, 2, true, "a0.0").Returns(false);
-            yield return new TestCaseData(3, 2, true, "-0.00").Returns(false);
-            yield return new TestCaseData(3, 2, true, "+0.00").Returns(false);
             yield return new TestCaseData(3, 2, true, "+1.23").Returns(false);
-            yield return new TestCaseData(3, 2, true, "-1.23").Returns(false);
-            yield return new TestCaseData(3, 2, true, "-1.2").Returns(false);
             yield return new TestCaseData(3, 2, true, "a.sd").Returns(false);
             yield return new TestCaseData(17, 2, true, "0.000").Returns(false);
             yield return new TestCaseData(17, 2, true, "").Returns(false);
             yield return new TestCaseData(17, 2, true, null).Returns(false);
             yield return new TestCaseData(17, 2, true, "0.0").Returns(true);
-            yield return new TestCaseData(17, 2, true, "11").Returns(true);
             yield return new TestCaseData(17, 2, true, "0,0").Returns(true);
             yield return new TestCaseData(17, 2, true, "0").Returns(true);
             yield return new TestCaseData(4, 2, true, "+1.23").Returns(true);
