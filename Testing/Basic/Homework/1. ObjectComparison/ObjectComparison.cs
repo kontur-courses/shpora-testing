@@ -17,13 +17,7 @@ public class ObjectComparison
 
         actualTsar.Should().BeEquivalentTo(expectedTsar,
             options => options
-                .Excluding(tsar => tsar.Id)
-                .Excluding(tsar => tsar.Parent));
-
-        expectedTsar.Parent.Should().BeEquivalentTo(actualTsar.Parent,
-            options => options
-                .Excluding(tsar => tsar.Id)
-                .Excluding(tsar => tsar.Weight));
+                .Excluding(tsar => tsar.Path.EndsWith("Id")));
     }
 
     [Test]
