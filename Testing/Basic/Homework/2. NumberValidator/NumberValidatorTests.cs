@@ -16,7 +16,6 @@ public class NumberValidatorTests
     [TestCase(2, -1, false, TestName = "WhenScaleIsLessThatZero")]
     [TestCase(2, 2, true, TestName = "WhenScaleEqualPrecisionOnlyPositive")]
     [TestCase(2, 2, false, TestName = "WhenScaleEqualPrecision")]
-
     public void Constructor_ShouldThrowArgumentException(int precision, int scale, bool onlyPositive)
     {
         var act = () => new NumberValidator(precision, scale, onlyPositive);
