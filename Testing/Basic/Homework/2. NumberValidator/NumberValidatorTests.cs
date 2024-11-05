@@ -72,7 +72,7 @@ public class NumberValidatorTests
     [TestCase("11.11.11", 17, 10, false)]
     [TestCase("11.22,33", 17, 10, false)]
     [TestCase("55,22,33", 17, 10, false)]
-    [TestCase("1/2", 17, 10, false)]
+    [TestCase("1\\2", 17, 10, false)]
     [TestCase("-100", 4, 0, true)]
     [TestCase("-0.00", 3, 2, true)]
     [TestCase("+1,23", 3, 2, true)]
