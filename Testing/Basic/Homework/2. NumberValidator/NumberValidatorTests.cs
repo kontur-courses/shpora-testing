@@ -26,7 +26,6 @@ public class NumberValidatorTests
 
     [TestCaseSource(nameof(ValidNumbersCases))]
     [TestCaseSource(nameof(InalidNumberCases))]
-    [TestCase("0.0", 15, 2, true, false)]
     public void IsValidNumber_ShouldValidateCorrectly(
         string input,
         int precision,
@@ -45,10 +44,11 @@ public class NumberValidatorTests
     {
         get
         {
-            yield return new TestCaseData("0.0", 15, 2, true, false).SetName("ForDecimal_ReturnTrue");
+            yield return new TestCaseData("0.0", 15, 2, true, true).SetName("ForDecimal_ReturnTrue");
             yield return new TestCaseData("0", 15, 2, true, true).SetName("ForInteger_ReturnTrue");
             yield return new TestCaseData("1,23", 4, 2, true, true).SetName("ForAnotherDecimalSeparator_ReturnTrue");
             yield return new TestCaseData("+1.23", 4, 2, true, true).SetName("ForPositiveNumberWithSignValidLenght_ReturnTrue");
+            yield return new TestCaseData("-12.23", 10, 2, false, true).SetName("ForNegativeNumberNotOnlyPositive_ReturnTrue");
         }
     }
 
@@ -62,7 +62,7 @@ public class NumberValidatorTests
             yield return new TestCaseData("+1.23", 3, 2, true, false).SetName("ForPositiveNumberWithSignInvalidLength_ReturnFalse");
             yield return new TestCaseData("0.000", 15, 2, true, false).SetName("ForMoreFractionalDigitsThenExpected_ReturnFalse");
             yield return new TestCaseData("-1.23", 3, 2, false, false).SetName("ForNegativeNumberInvalidLength_ReturnFalse");
-            yield return new TestCaseData("-1.23", 4, 2, true, false).SetName("ForNegativeNumberNotAllowed_ReturnFalse");
+            yield return new TestCaseData("-1.23", 4, 2, true, false).SetName("ForNegativeNumberOnlyPositive_ReturnFalse");
             yield return new TestCaseData("a.sd", 3, 2, true, false).SetName("ForNonnumericInput_ReturnFalse");
             yield return new TestCaseData("", 2, 1, true, false).SetName("ForEmptyInput_ReturnFalse");
             yield return new TestCaseData(".123", 4, 2, true, false).SetName("ForMissingLeadingZero_ReturnFalse");
