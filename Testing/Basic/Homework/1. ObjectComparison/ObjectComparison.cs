@@ -20,8 +20,7 @@ public class ObjectComparison
             .BeEquivalentTo(expectedTsar, options =>
                 options
                     .AllowingInfiniteRecursion()
-                    .Excluding(o => o.Id)
-                    .Excluding(o => o.Parent.Id));
+                    .Excluding(o => o.DeclaringType == typeof(Person) && o.Name == nameof(Person.Id)));
     }
 
     [Test]
@@ -44,8 +43,10 @@ public class ObjectComparison
 
     private bool AreEqual(Person? actual, Person? expected)
     {
-        if (actual == expected) return true;
-        if (actual == null || expected == null) return false;
+        if (actual == expected)
+            return true;
+        if (actual == null || expected == null)
+            return false;
         return
             actual.Name == expected.Name
             && actual.Age == expected.Age
