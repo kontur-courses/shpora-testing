@@ -2,25 +2,22 @@
 
 public class TestPersonBuilder
 {
-	private const string DEFAULT_NAME = "";
-	private const int DEFAULT_AGE = 0;
-	private const int DEFAULT_HEIGHT = 0;
-	private const int DEFAULT_WEIGHT = 0;
-
-	private string name = DEFAULT_NAME;
-	private int age = DEFAULT_AGE;
-	private int height = DEFAULT_HEIGHT;
-	private int weight = DEFAULT_WEIGHT;
+	private string name = string.Empty;
+	private int age = 0;
+	private int height = 0;
+	private int weight = 0;
 	private Person? parent = null;
 
-	private TestPersonBuilder()
-	{
-	}
+	private TestPersonBuilder() { }
+
+	public static Person TestUser() => Create().Build();
 
 	public static TestPersonBuilder Create()
 	{
 		return new TestPersonBuilder();
 	}
+
+	public Person Build() => new(name, age, height, weight, parent);
 
 	public TestPersonBuilder WithName(string newName)
 	{
@@ -51,11 +48,4 @@ public class TestPersonBuilder
 		parent = newParent;
 		return this;
 	}
-
-	public Person Build()
-	{
-		return new Person(name, age, height, weight, parent);
-	}
-
-	public static Person TestUser() => Create().Build();
 }

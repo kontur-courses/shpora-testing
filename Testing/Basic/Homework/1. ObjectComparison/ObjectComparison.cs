@@ -27,8 +27,7 @@ public class ObjectComparison
             .Build();
 
         actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
-            .Excluding(p => p.Id)
-            .Excluding(p => p.Parent.Id));
+            .Excluding(ctx => ctx.Path.EndsWith("Id")));
     }
 
     // 1. Код менее читаемый и менее декларативный.
