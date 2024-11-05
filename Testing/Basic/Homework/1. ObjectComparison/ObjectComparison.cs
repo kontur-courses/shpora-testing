@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
@@ -13,17 +14,14 @@ public class ObjectComparison
 
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .IncludingNestedObjects()
+            .Excluding(p => p.Id)
+            .Excluding(p => p.Parent.Id));
+        //+Проверяет все поля класса на эквивалентность
+        //+При добавлении нового поля в класс проверка будет автоматически включена
+        //+Уменьшено количество кода
+        //+Удобный вывод при непрохождении теста(показаны несовпадающие поля)
     }
 
     [Test]
@@ -36,6 +34,10 @@ public class ObjectComparison
 
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
+
+        //-При появлении новых полей придется переписывать тест
+        //-Функция возвращает bool, что не информативно
+        //-Для того чтобы узнать различия между царями придется дебажить и проверять каждое условие
     }
 
     private bool AreEqual(Person? actual, Person? expected)
