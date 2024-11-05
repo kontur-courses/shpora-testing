@@ -7,7 +7,7 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorShould
 {
-    [Test, TestCaseSource(nameof(InvalidPrecisionAndScaleData))]
+    [TestCaseSource(nameof(InvalidPrecisionAndScaleData))]
     public void ThrowArgumentException_AfterCreatingWithInvalidPrecisionAndScale(int precision, int scale)
     {
         var createNumberValidator = () => new NumberValidator(precision, scale);
@@ -27,7 +27,7 @@ public class NumberValidatorShould
         }
     }
 
-    [Test, TestCaseSource(nameof(ValidPrecisionAndScaleData))]
+    [TestCaseSource(nameof(ValidPrecisionAndScaleData))]
     public void NotThrowArgumentException_AfterCreatingWithValidPrecisionAndScale(int precision, int scale)
     {
         var createNumberValidator = () => new NumberValidator(precision, scale);
@@ -44,7 +44,7 @@ public class NumberValidatorShould
         }
     }
 
-    [Test, TestCaseSource(nameof(ValidTestCases))]
+    [TestCaseSource(nameof(ValidTestCases))]
     public bool ReturnTrue_AfterCheckingValid(int precision, int scale, bool onlyPositive, string str)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
@@ -63,7 +63,7 @@ public class NumberValidatorShould
         }
     }
 
-    [Test, TestCaseSource(nameof(InvalidTestCases))]
+    [TestCaseSource(nameof(InvalidTestCases))]
     public bool ReturnFalse_AfterCheckingValid(int precision, int scale, bool onlyPositive, string str)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
