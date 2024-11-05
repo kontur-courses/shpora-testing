@@ -7,7 +7,11 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorShould
 {
-    [TestCaseSource(nameof(InvalidPrecisionAndScaleData))]
+    [TestCase(-1, 0)]
+    [TestCase(0, 0)]
+    [TestCase(1, -2)]
+    [TestCase(1, 2)]
+    [TestCase(1, 1)]
     public void ThrowArgumentException_AfterCreatingWith(int precision, int scale)
     {
         var createNumberValidator = () => new NumberValidator(precision, scale);
@@ -15,33 +19,13 @@ public class NumberValidatorShould
         createNumberValidator.Should().Throw<ArgumentException>();
     }
 
-    private static IEnumerable InvalidPrecisionAndScaleData
-    {
-        get
-        {
-            yield return new TestCaseData(-1, 0);
-            yield return new TestCaseData(0, 0);
-            yield return new TestCaseData(1, -2);
-            yield return new TestCaseData(1, 2);
-            yield return new TestCaseData(1, 1);
-        }
-    }
-
-    [TestCaseSource(nameof(ValidPrecisionAndScaleData))]
-    public void NotThrowArgumentException_AfterCreating(int precision, int scale)
+    [TestCase(3, 2)]
+    [TestCase(int.MaxValue, int.MaxValue - 1)]
+    public void NotThrowArgumentException_AfterCreatingWith(int precision, int scale)
     {
         var createNumberValidator = () => new NumberValidator(precision, scale);
 
         createNumberValidator.Should().NotThrow<ArgumentException>();
-    }
-
-    private static IEnumerable ValidPrecisionAndScaleData
-    {
-        get
-        {
-            yield return new TestCaseData(3, 2);
-            yield return new TestCaseData(int.MaxValue, int.MaxValue - 1);
-        }
     }
 
     [TestCaseSource(nameof(IsValidTestCases))]
