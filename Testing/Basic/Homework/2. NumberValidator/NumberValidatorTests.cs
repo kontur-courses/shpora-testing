@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using FluentAssertions;
 using System.Collections;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
