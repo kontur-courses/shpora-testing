@@ -8,23 +8,11 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void Should_Throw_ArgumentException_If_Precision_Is_Negative() =>
-        ShouldThrowExceptionWhenCreating(-1, 5);
-
-    [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Is_Negative() =>
-        ShouldThrowExceptionWhenCreating(5, -1);
-
-    [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Greater_Precision() =>
-        ShouldThrowExceptionWhenCreating(2, 5);
-
-    [Test]
-    public void Should_Throw_ArgumentException_If_Scale_Equal_Precision() =>
-        ShouldThrowExceptionWhenCreating(2, 2);
-
-    private void ShouldThrowExceptionWhenCreating(int precision, int scale)
+    [TestCase(-1, 5)]
+    [TestCase(5, -1)]
+    [TestCase(2, 5)]
+    [TestCase(2, 2)]
+    public void Should_Throw_Exception_With_Incorrect_Parameters(int precision, int scale)
     {
         var builder = new TestNumberValidatorBuilder().WithPrecisionAndScale(precision, scale);
         
