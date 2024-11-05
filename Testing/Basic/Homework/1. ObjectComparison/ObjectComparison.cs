@@ -17,8 +17,8 @@ public class ObjectComparison
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
         actualTsar.Should().BeEquivalentTo(ExpectedTsar(), options => options
-            .AllowingInfiniteRecursion()
-            .Excluding(o => o.Path.EndsWith("Id")));
+            .Excluding(o => o.Id)
+            .Excluding(p => p.Parent.Id));
     }
 
     [Test]
