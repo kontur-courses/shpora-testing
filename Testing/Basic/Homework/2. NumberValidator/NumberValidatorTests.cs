@@ -7,7 +7,7 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
     [Test]
-    public void NumberValidator_WhenScaleIsZero_NotFails()
+    public void NumberValidator_NotThrow_WhenScaleIsZero()
     {
         Action act = () => new NumberValidator(1, 0, true);
 
@@ -16,7 +16,7 @@ public class NumberValidatorTests
     }
 
     [Test]
-    public void NumberValidator_WhenPrecisionIsNegative_Fails()
+    public void NumberValidator_Throw_WhenPrecisionIsNegative()
     {
         Action act = () => new NumberValidator(-1, 2);
 
@@ -26,7 +26,7 @@ public class NumberValidatorTests
     }
 
     [Test]
-    public void NumberValidator_WhenPrecisionIsZero_Fails()
+    public void NumberValidator_Throw_WhenPrecisionIsZero()
     {
         Action act = () => new NumberValidator(0, 2);
 
@@ -36,7 +36,7 @@ public class NumberValidatorTests
     }
 
     [Test]
-    public void NumberValidator_WhenScaleIsNegative_Fails()
+    public void NumberValidator_Throw_WhenScaleIsNegative()
     {
         Action act = () => new NumberValidator(1, -1);
 
@@ -46,7 +46,7 @@ public class NumberValidatorTests
     }
 
     [Test]
-    public void NumberValidator_WhenPrecisionLessThanScale_Fails()
+    public void NumberValidator_Throw_WhenPrecisionLessThanScale()
     {
         Action act = () => new NumberValidator(1, 2);
 
