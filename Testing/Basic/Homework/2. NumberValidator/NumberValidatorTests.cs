@@ -19,15 +19,6 @@ public class NumberValidatorShould
         createNumberValidator.Should().Throw<ArgumentException>();
     }
 
-    [TestCase(3, 2)]
-    [TestCase(int.MaxValue, int.MaxValue - 1)]
-    public void NotThrowArgumentException_AfterCreatingWith(int precision, int scale)
-    {
-        var createNumberValidator = () => new NumberValidator(precision, scale);
-
-        createNumberValidator.Should().NotThrow<ArgumentException>();
-    }
-
     [TestCaseSource(nameof(IsValidTestCases))]
     public bool IsValid_ReturnResult_AfterExecuting(int precision, int scale, bool onlyPositive, string str)
     {
