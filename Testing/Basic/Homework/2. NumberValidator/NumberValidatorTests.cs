@@ -6,10 +6,10 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-1, 5, TestName = "_IfPrecisionIsNegative")]
-    [TestCase(5, -1, TestName = "_IfScaleIsNegative")]
-    [TestCase(2, 5, TestName = "_IfScaleGreaterPrecision")]
-    [TestCase(2, 2, TestName = "_IfScaleEqualPrecision")]
+    [TestCase(-1, 5, TestName = "IfPrecisionIsNegative")]
+    [TestCase(5, -1, TestName = "IfScaleIsNegative")]
+    [TestCase(2, 5, TestName = "IfScaleGreaterPrecision")]
+    [TestCase(2, 2, TestName = "IfScaleEqualPrecision")]
     public void ShouldThrowArgumentException(int precision, int scale)
     {
         var numberValidatorConstructor = () => new NumberValidator(precision, scale);
