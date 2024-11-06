@@ -15,9 +15,7 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
-                                                                    .Excluding(x => x.Id)
-                                                                    .Excluding(x => x.Parent.Id));
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options.Excluding(x => x.Path.Contains("Id")));
     }
 
     [Test]
@@ -37,7 +35,7 @@ public class ObjectComparison
     // + сам ClassicAssert плохо читается в сравнении с FluentAssertion
     // 
     // 2) Не расширяемый: при добавлении новых полей и свойств нужно будет править этот метод,
-    // тесты будут выполняться неверно или падать
+    // тесты будут выполняться неверно 
     //
     // 3) Повторяющийся код сравнения свойств, выглядит не очень
     //

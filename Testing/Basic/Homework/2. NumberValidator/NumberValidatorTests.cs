@@ -6,26 +6,24 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
     [TestCase(-1, 0, TestName = "NegativePrecision")]
     [TestCase(0, 0, TestName = "ZeroPrecision")]
     [TestCase(1, -1, TestName = "NegativeScale")]
     [TestCase(1, 2, TestName = "ScaleGreraterThenPrecision")]
     public void ValidateConstructor_ThrowsException_WithUncorrectData(int precision, int scale)
     {
-        Action act = () => new NumberValidator(precision, scale);
-        act.Should().Throw<ArgumentException>();
+        Action action = () => new NumberValidator(precision, scale);
+        action.Should().Throw<ArgumentException>();
     }
 
-    [Test]
-    [TestCase(1, 0, TestName = "CorrectData")]
+    [TestCase(2, 1, TestName = "CorrectData")]
+    [TestCase(1, 0, TestName = "CorrectDataWithZeroScope")]
     public void ValidateConstructor_DontThrowsException_WithCorrectData(int precision, int scale)
     {
-        Action act = () => new NumberValidator(precision, scale);
-        act.Should().NotThrow();
+        Action action = () => new NumberValidator(precision, scale);
+        action.Should().NotThrow();
     }
 
-    [Test]
     [TestCase("0.0", true, true, TestName = "SimpleCorrectValueWithPoint")]
     [TestCase("0,0", true, true, TestName = "SimpleCorrectValueWithComma")]
     [TestCase("0", true, true, TestName = "SimpleDataWithoutValue")]
