@@ -6,23 +6,23 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-1, 5, TestName = "Should_Throw_ArgumentException_If_Precision_Is_Negative")]
-    [TestCase(5, -1, TestName = "Should_Throw_ArgumentException_If_Scale_Is_Negative")]
-    [TestCase(2, 5, TestName = "Should_Throw_ArgumentException_If_Scale_Greater_Precision")]
-    [TestCase(2, 2, TestName = "Should_Throw_ArgumentException_If_Scale_Equal_Precision")]
-    public void Should_Throw_Exception(int precision, int scale)
+    [TestCase(-1, 5, TestName = "_IfPrecisionIsNegative")]
+    [TestCase(5, -1, TestName = "_IfScaleIsNegative")]
+    [TestCase(2, 5, TestName = "_IfScaleGreaterPrecision")]
+    [TestCase(2, 2, TestName = "_IfScaleEqualPrecision")]
+    public void ShouldThrowArgumentException(int precision, int scale)
     {
-        var act = () => new NumberValidator(precision, scale);
+        var numberValidatorConstructor = () => new NumberValidator(precision, scale);
         
-        act.Should().Throw<ArgumentException>();
+        numberValidatorConstructor.Should().Throw<ArgumentException>();
     }
 
     [Test]
     public void Should_DoesNotThrow_Exception_If_Scale_And_Precision_Is_Correct()
     {
-        var act = () => new NumberValidator(10, 5);
+        var numberValidatorConstructor = () => new NumberValidator(10, 5);
         
-        act.Should().NotThrow<ArgumentException>();
+        numberValidatorConstructor.Should().NotThrow<ArgumentException>();
     }
 
     [TestCase(null, TestName = "IsValidNumber_Should_Return_False_If_Value_Is_Null")]
