@@ -58,28 +58,19 @@ public class NumberValidatorTests
     [Test]
     public void IsValidNumber_ReturnsTrue_WhenPrecisionAndScaleMoreThanValueIntAndFracParts()
     {
-        var value = "0.0";
-        var validator = new NumberValidator(17, 2, true);
-
-        IsValidNumber_ReturnsTrue(value, validator);
+        IsValidNumber_ReturnsTrue("0.0", new (17, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsTrue_WhenValueIsIntegerAndHasLessDigitsThanPrecision()
     {
-        var value = "0";
-        var validator = new NumberValidator(17, 2, true);
-
-        IsValidNumber_ReturnsTrue(value, validator);
+        IsValidNumber_ReturnsTrue("0", new (17, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsTrue_WhenLengthIntPartAndFracPartEqualToPrecision_IncludingNumberSign()
     {
-        var value = "+1.23";
-        var validator = new NumberValidator(4, 2, true);
-
-        IsValidNumber_ReturnsTrue(value, validator);
+        IsValidNumber_ReturnsTrue("+1.23", new (4, 2, true));
     }
 
     private void IsValidNumber_ReturnsTrue(string value, NumberValidator validator)
@@ -93,55 +84,37 @@ public class NumberValidatorTests
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForPositiveNumber()
     {
-        var value = "+1.23";
-        var validator = new NumberValidator(3, 2, true);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("+1.23", new (3, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForNegativeNumber()
     {
-        var value = "-1.23";
-        var validator = new NumberValidator(3, 2);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("-1.23", new (3, 2));
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueFracPartMoreThanScale()
     {
-        var value = "0.000";
-        var validator = new NumberValidator(17, 2, true);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("0.000", new (17, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueContainsNonDigitSymbols()
     {
-        var value = "a.sd";
-        var validator = new NumberValidator(3, 2, true);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("a.sd", new (3, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueSymbolsCountMoreThanPrecision()
     {
-        var value = "00.00";
-        var validator = new NumberValidator(3, 2, true);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("00.00", new (3, 2, true));
     }
 
     [Test]
     public void IsValidNumber_ReturnsFalse_WhenValueNegative_WithOnlyPositiveNumberValidator()
     {
-        var value = "-0.00";
-        var validator = new NumberValidator(4, 2, true);
-
-        IsValidNumber_ReturnsFalse(value, validator);
+        IsValidNumber_ReturnsFalse("-0.00", new (4, 2, true));
     }
 
     private void IsValidNumber_ReturnsFalse(string value, NumberValidator validator)
