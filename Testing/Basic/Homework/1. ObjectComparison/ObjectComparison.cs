@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -10,22 +11,30 @@ public class ObjectComparison
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
+        var expectedParentTsar = TestPersonBuilder.Create()
+            .WithName("Vasili III of Russia")
+            .WithAge(28)
+            .WithHeight(170)
+            .WithWeight(60)
+            .Build();
 
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+        var expectedTsar = TestPersonBuilder.Create()
+            .WithName("Ivan IV The Terrible")
+            .WithAge(54)
+            .WithHeight(170)
+            .WithWeight(70)
+            .WithParent(expectedParentTsar)
+            .Build();
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(ctx => ctx.Path.EndsWith("Id")));
     }
 
+    // 1. Код менее читаемый и менее декларативный.
+    // 2. Требуется понимание того, что происходит в AreEqual.
+    // 3. Потребуется вручную обновлять логику сравнения в AreEqual, что может привести к ошибкам.
+    // 4. Не информативное сообщение при упавшем тесте.
+    // 5. При добавлении новых полей в Person потребуется обновлять все места создания Person.
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
     public void CheckCurrentTsar_WithCustomEquality()
