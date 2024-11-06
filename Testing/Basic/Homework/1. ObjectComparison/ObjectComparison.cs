@@ -13,12 +13,14 @@ public class ObjectComparison
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+            new Person("Vasili III of Russia", 28, 170, 60,
+                new Person("Ivan III", 65, 170, 80, null)));
 
-        actualTsar.Should().BeEquivalentTo(expectedTsar, 
-            options => options.Excluding(person => person.Id).
-                Excluding(person => person.Parent.Id));
-    }
+
+		actualTsar.Should().BeEquivalentTo(expectedTsar, 
+            options => options
+            .Excluding(p => p.Path.EndsWith("Id")));
+	}
 	/*
 	 * Преимущества подхода:
 	 * 1)   Хорошая информативность: при непрохождении теста ясно показывается, какие поля не совпали.
@@ -32,7 +34,8 @@ public class ObjectComparison
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+			new Person("Vasili III of Russia", 28, 170, 60,
+				new Person("Ivan III", 65, 170, 80, null)));
 
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
