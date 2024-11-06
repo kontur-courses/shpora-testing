@@ -16,7 +16,7 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
         actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
             .IncludingNestedObjects()
-            .Excluding(p => p.Path.Contains("Id")));
+            .Excluding(p => p.Name.Equals(nameof(Person.Id)) && p.DeclaringType == typeof(Person)));
         //+Проверяет все поля класса на эквивалентность
         //+При добавлении нового поля в класс проверка будет автоматически включена
         //+Уменьшено количество кода

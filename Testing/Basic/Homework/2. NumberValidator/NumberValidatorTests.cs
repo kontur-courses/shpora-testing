@@ -33,7 +33,6 @@ public class NumberValidatorTests
             numberForCheck.IsValidNumber(null).Should().BeFalse(because: "Ввод пуст");
 
             numberForCheck.IsValidNumber("a.sd").Should().BeFalse(because: "Используются не арабские цифры");
-            numberForCheck.IsValidNumber("సున్న.నాలుగు").Should().BeFalse(because: "Используются не арабские цифры");
             numberForCheck.IsValidNumber("IV.III").Should().BeFalse(because: "Используются не арабские цифры");
             numberForCheck.IsValidNumber("девять.ноль").Should().BeFalse(because: "Используются не арабские цифры");
 
@@ -51,6 +50,9 @@ public class NumberValidatorTests
             numberForCheck.IsValidNumber("+1,23").Should().BeTrue(because: "Знак запятой допустим");
             numberForCheck = new NumberValidator(4, 2, false);
             numberForCheck.IsValidNumber("-1.23").Should().BeTrue();
+            numberForCheck.IsValidNumber("౧.౪").Should().BeTrue(because: "Используются цифры телугу");
+            numberForCheck.IsValidNumber("๕.๕").Should().BeTrue(because: "Используются тайские цифры");
+            numberForCheck.IsValidNumber("४.४").Should().BeTrue(because: "Используются цифры деванагари");
             //Тесты для проверки "нормальных" и пороговых значений
             
             numberForCheck = new NumberValidator(3, 2, true);
