@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using NUnit.Framework.Legacy;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
@@ -63,6 +61,10 @@ public class NumberValidatorTests
     [TestCase(17, 2, true, "1.a", ExpectedResult = false)]
     [TestCase(17, 2, true, "a.1", ExpectedResult = false)]
     [TestCase(17, 2, true, "0.,0", ExpectedResult = false)]
+    [TestCase(17, 2, true, ".0", ExpectedResult = false)]
+    [TestCase(17, 2, false, "+-0.0", ExpectedResult = false)]
+    [TestCase(17, 2, false, "0.", ExpectedResult = false)]
+    [TestCase(17, 2, true, "1.1\n1", ExpectedResult = false)]
     public bool IsValidNumber_ReturnFalse_WhenGivenNotANumberValues(int precision,
         int scale, bool onlyPositive, string value)
     {
