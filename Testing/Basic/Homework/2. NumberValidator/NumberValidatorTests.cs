@@ -19,31 +19,23 @@ public class NumberValidatorShould
         createNumberValidator.Should().Throw<ArgumentException>();
     }
 
-    [TestCaseSource(nameof(IsValidTestCases))]
+    [TestCase(3, 2, true, "00.00", ExpectedResult = false)]
+    [TestCase(3, 2, true, "+1.23", ExpectedResult = false)]
+    [TestCase(3, 2, true, "a.sd", ExpectedResult = false)]
+    [TestCase(17, 2, true, "+.00", ExpectedResult = false)]
+    [TestCase(17, 2, true, "0.0a", ExpectedResult = false)]
+    [TestCase(17, 2, true, "a0.0", ExpectedResult = false)]
+    [TestCase(17, 2, true, "0.000", ExpectedResult = false)]
+    [TestCase(17, 2, true, "", ExpectedResult = false)]
+    [TestCase(17, 2, true, null, ExpectedResult = false)]
+    [TestCase(17, 2, true, "0.0", ExpectedResult = true)]
+    [TestCase(17, 2, null, "0.0", ExpectedResult = true)]
+    [TestCase(17, 2, true, "0,0", ExpectedResult = true)]
+    [TestCase(17, 2, true, "0", ExpectedResult = true)]
+    [TestCase(4, 2, true, "+1.23", ExpectedResult = true)]
+    [TestCase(4, 2, false, "-1.23", ExpectedResult = true)]
     public bool IsValid_ReturnResult_AfterExecuting(int precision, int scale, bool onlyPositive, string str)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
-    }
-
-    private static IEnumerable IsValidTestCases
-    {
-        get
-        {
-            yield return new TestCaseData(3, 2, true, "00.00").Returns(false);
-            yield return new TestCaseData(17, 2, true, "+.00").Returns(false);
-            yield return new TestCaseData(17, 2, true, "0.0a").Returns(false);
-            yield return new TestCaseData(17, 2, true, "a0.0").Returns(false);
-            yield return new TestCaseData(3, 2, true, "+1.23").Returns(false);
-            yield return new TestCaseData(3, 2, true, "a.sd").Returns(false);
-            yield return new TestCaseData(17, 2, true, "0.000").Returns(false);
-            yield return new TestCaseData(17, 2, true, "").Returns(false);
-            yield return new TestCaseData(17, 2, true, null).Returns(false);
-            yield return new TestCaseData(17, 2, true, "0.0").Returns(true);
-            yield return new TestCaseData(17, 2, null, "0.0").Returns(true);
-            yield return new TestCaseData(17, 2, true, "0,0").Returns(true);
-            yield return new TestCaseData(17, 2, true, "0").Returns(true);
-            yield return new TestCaseData(4, 2, true, "+1.23").Returns(true);
-            yield return new TestCaseData(4, 2, false, "-1.23").Returns(true);
-        }
     }
 }
