@@ -10,6 +10,8 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
     [Test]
+    [Description("Проверяем, что конструктор NumberValidator не кидает исключения если входные параметры" +
+                 "заданы верно: precision > 0 и 0 <= scale < precision")]
     [TestCase(1, 0, true)]
     [TestCase(1, 0, false)]
     [TestCase(12, 5, true)]
@@ -25,6 +27,8 @@ public class NumberValidatorTests
     }
 
     [Test]
+    [Description("Проверяем, что конструктор NumberValidator кидает ArgumentException, " +
+                 "если аргумент scale имеет значение больше или равное precision")]
     [TestCase(1, 2, false)]
     [TestCase(1, 2, true)]
     [TestCase(7, 9, true)]
@@ -43,6 +47,8 @@ public class NumberValidatorTests
     }
 
     [Test]
+    [Description("Проверяем, что конструктор NumberValidator кидает ArgumentException, " +
+                 "если аргумент precision имеет значение меньше или равное нулю")]
     [TestCase(-1, 2, false)]
     [TestCase(-1, 2, true)]
     [TestCase(0, 0, false)]
@@ -59,6 +65,8 @@ public class NumberValidatorTests
     }
 
     [Test]
+    [Description("Проверяем, что конструктор NumberValidator кидает ArgumentException, " +
+                 "если аргумент scale имеет значение меньше нуля")]
     [TestCase(1, -2, true)]
     [TestCase(1, -2, false)]
     [TestCase(7, -1, true)]
@@ -75,6 +83,11 @@ public class NumberValidatorTests
     }
 
     [Test]
+    [Description("Проверяем, что метод IsValidNumber возвращает: " +
+                 "1) true для корректных чисел если они положительны (параметр onlyPositive == true)" +
+                 "2) false для некорректных и любых отрицательных чисел (параметр onlyPositive == true)" +
+                 "3) true для корректных чисел с любым знаком (параметр onlyPositive == false)" +
+                 "4) false для некорректных чисел с любым знаком (параметр onlyPositive == false)")]
     [TestCaseSource(nameof(OnlyPositiveValidNumberCases))]
     [TestCaseSource(nameof(OnlyPositiveInvalidNumberCases))]
     [TestCaseSource(nameof(GeneralValidNumberCases))]
