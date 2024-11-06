@@ -7,11 +7,11 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-1, 2, true, TestName = "NumberValidator_WithNegativePrecision_ThrowsException")]
-    [TestCase(0, 2, false, TestName = "NumberValidator_WithPrecisionEqualsZero_ThrowsException")]
-    [TestCase(1, -2, true, TestName = "NumberValidator_WithNegativeScale_ThrowsException")]
-    [TestCase(1, 2, false, TestName = "NumberValidator_WithScaleGreaterThanPrecision_ThrowsException")]
-    [TestCase(1, 1, true, TestName = "NumberValidator_WithScaleEqualsPrecision_ThrowsException")]
+    [TestCase(-1, 2, true, TestName = "WithNegativePrecision")]
+    [TestCase(0, 2, false, TestName = "WithPrecisionEqualsZero")]
+    [TestCase(1, -2, true, TestName = "WithNegativeScale")]
+    [TestCase(1, 2, false, TestName = "WithScaleGreaterThanPrecision")]
+    [TestCase(1, 1, true, TestName = "WithScaleEqualsPrecision")]
     public void NumberValidation_ConstructorThrowsArgumentException(int precision, int scale, bool onlyPositive)
     {
         var action = () => new NumberValidator(precision, scale, onlyPositive);
@@ -19,8 +19,8 @@ public class NumberValidatorTests
         action.Should().Throw<ArgumentException>();
     }
 
-    [Test(Description = "NumberValidator_WithCorrectParameters_NotThrowException")]
-    public void NumberValidation_ConstructorDoesNotHaveArgumentException()
+    [Test]
+    public void NumberValidation_WhenCorrectParameters_NotThrowsException()
     {
         var action = () => new NumberValidator(1, 0, true);
 
@@ -57,10 +57,16 @@ public class NumberValidatorTests
     {
         get
         {
-            yield return new TestCaseData(2, 0, true, "-1").SetName("ForNegativeInteger_WithMinusSign_OnlyPositiveIsFalse").Returns(false);
+            yield return new TestCaseData(2, 0, true, "-1").SetName("ForNegativeInteger_WhenOnlyPositiveConfigured_ReturnFalse").Returns(false);
+            yield return new TestCaseData(10, 5, true, "-23.15").SetName("ForNegativeDecimal_WhenOnlyPositiveConfigured_ReturnFalse").Returns(false);
             yield return new TestCaseData(3, 2, true, "4321.5").SetName("ForDecimal_WithIncorrectPrecision_ReturnFalse").Returns(false);
-            yield return new TestCaseData(3, 0, true, "+145").SetName("ForPositiveDecimal_WithPlusSign_PrecisionCalculationAccountPlusSign").Returns(false);
-            yield return new TestCaseData(3, 0, false, "-124").SetName("ForNegativeDecimal_WithMinusSign_PrecisionCalculationAccountMinusSign").Returns(false);
+            yield return new TestCaseData(5, 0, true, "132568").SetName("ForInteger_WithIncorrectPrecision_ReturnFalse").Returns(false);
+            yield return new TestCaseData(5, 2, true, "0.123").SetName("ForPositiveDecimal_WithIncorrectScale_ReturnFalse").Returns(false);
+            yield return new TestCaseData(7, 2, false, "-0.432").SetName("ForNegativeDecimal_WithIncorrectScale_ReturnFalse").Returns(false);
+            yield return new TestCaseData(3, 0, true, "+145").SetName("ForPositiveInteger_WithSign_PrecisionCalculationAccountPlusSign").Returns(false);
+            yield return new TestCaseData(3, 1, true, "+645.4").SetName("ForPositiveDecimal_WithSign_PrecisionCalculationAccountPlusSign").Returns(false);
+            yield return new TestCaseData(3, 0, false, "-124").SetName("ForNegativeInteger_WithSign_PrecisionCalculationAccountMinusSign").Returns(false);
+            yield return new TestCaseData(3, 1, false, "-325.7").SetName("ForNegativeDecimal_WithSign_PrecisionCalculationAccountMinusSign").Returns(false);
         }
     }
 
@@ -69,10 +75,9 @@ public class NumberValidatorTests
         get
         {
             yield return new TestCaseData(10, 9, true, "127.0.0.1").SetName("ForNumber_WithNonRealNumberFormat_ReturnFalse").Returns(false);
-            yield return new TestCaseData(2, 0, true, "").SetName("ForNumber_IsEmptyString_ReturnFalse").Returns(false);
             yield return new TestCaseData(2, 1, true, ".0").SetName("ForNumber_WithMissingIntegerPart_ReturnFalse").Returns(false);
             yield return new TestCaseData(2, 0, true, "0.").SetName("ForNumber_WithMissingFractionalPart_ReturnFalse").Returns(false);
-            yield return new TestCaseData(10, 2, true, "abcde.f").SetName("ForNumber_WithNonDigitCharacters_ReturnFalse").Returns(false);
+            yield return new TestCaseData(10, 2, true, " abcde.f").SetName("ForNotNumberInput_ReturnFalse").Returns(false);
 
         }
     }
