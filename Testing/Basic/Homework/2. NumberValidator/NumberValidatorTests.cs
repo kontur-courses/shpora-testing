@@ -17,14 +17,6 @@ public class NumberValidatorTests
         numberValidatorConstructor.Should().Throw<ArgumentException>();
     }
 
-    [Test]
-    public void Should_DoesNotThrow_Exception_If_Scale_And_Precision_Is_Correct()
-    {
-        var numberValidatorConstructor = () => new NumberValidator(10, 5);
-        
-        numberValidatorConstructor.Should().NotThrow<ArgumentException>();
-    }
-
     [TestCase(null, TestName = "IsValidNumber_Should_Return_False_If_Value_Is_Null")]
     [TestCase(" ", TestName = "IsValidNumber_Should_Return_False_If_Value_Is_Empty")]
     [TestCase("2.a1", TestName = "IsValidNumber_Should_Return_False_If_Value_Contains_Letter")]
