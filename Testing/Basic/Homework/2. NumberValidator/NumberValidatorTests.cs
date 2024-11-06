@@ -8,13 +8,28 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidatorTests
 {
     [Test]
-    public void Test()
+    public void NumberValidator_IncorrectPrecision_Exception()
     {
         Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+    }
 
+    [Test]
+    public void NumberValidator_CorrectInitialization_NoExceptions()
+    {
+        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+    }
+
+    [Test]
+    public void NumberValidator_IncorrectScale_Exception()
+    {
+        Assert.Throws<ArgumentException>(() => new NumberValidator(1, -1, true));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(1, 2, true));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(1, 1, true));
+    }
+    
+    [Test]
+    public void Test()
+    {
         ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
         ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
         ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
