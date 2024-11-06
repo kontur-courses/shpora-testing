@@ -17,28 +17,26 @@ public class NumberValidatorTests
         numberValidatorConstructor.Should().Throw<ArgumentException>();
     }
 
-    [TestCase(null, false, TestName = "IfValueIsNull")]
-    [TestCase(" ", false, TestName = "IfValueIsEmpty")]
-    [TestCase("2.a1", false, TestName = "IfValueContainsLetter")]
-    [TestCase("0.", false, TestName = "IfValueContainsSeparatorWithoutFracPart")]
-    [TestCase(",0", false, TestName = "IfValueWithoutIntPart")]
-    [TestCase("0*0", false, TestName = "IfValueSeparatorIncorrect")]
-    [TestCase("!0,0", false, TestName = "IfValueSignIncorrect")]
-    [TestCase("1,234", false, TestName = "IfValueFracPartMoreThanScale")]
-    [TestCase("11111", false, TestName = "IfValueIntPartMoreThanPrecision")]
-    [TestCase("225,32", false, TestName = "IfValueWithFracPartMoreThanPrecision")]
-    [TestCase("+14,23", false, TestName = "IfValueWithSignMoreThanPrecision")]
-    [TestCase("-0", false, TestName = "IfOnlyPositiveTrueAndValueContainsMinus")]
-    [TestCase("-1,4", true, false, TestName = "IfOnlyPositiveFalseAndValueContainsMinus")]
-    [TestCase("1", true, TestName = "IfValueIntPart")]
-    [TestCase("+1,44", true, TestName = "IfValueContainsFracPartAndSign")]
-    [TestCase("15,44", true, TestName = "IfValueContainsFracPart")]
-    public void IsValidNumber_ShouldReturnExpectedResult(string value,  bool expectedResult, bool onlyPositive = true)
+    [TestCase(null, ExpectedResult = false, TestName = "IfValueIsNull")]
+    [TestCase(" ", ExpectedResult = false, TestName = "IfValueIsEmpty")]
+    [TestCase("2.a1", ExpectedResult = false, TestName = "IfValueContainsLetter")]
+    [TestCase("0.", ExpectedResult = false, TestName = "IfValueContainsSeparatorWithoutFracPart")]
+    [TestCase(",0", ExpectedResult = false, TestName = "IfValueWithoutIntPart")]
+    [TestCase("0*0", ExpectedResult = false, TestName = "IfValueSeparatorIncorrect")]
+    [TestCase("!0,0", ExpectedResult = false, TestName = "IfValueSignIncorrect")]
+    [TestCase("1,234", ExpectedResult = false, TestName = "IfValueFracPartMoreThanScale")]
+    [TestCase("11111", ExpectedResult = false, TestName = "IfValueIntPartMoreThanPrecision")]
+    [TestCase("225,32", ExpectedResult = false, TestName = "IfValueWithFracPartMoreThanPrecision")]
+    [TestCase("+14,23", ExpectedResult = false, TestName = "IfValueWithSignMoreThanPrecision")]
+    [TestCase("-0", ExpectedResult = false, TestName = "IfOnlyPositiveTrueAndValueContainsMinus")]
+    [TestCase("-1,4", false, ExpectedResult = true, TestName = "IfOnlyPositiveFalseAndValueContainsMinus")]
+    [TestCase("1", ExpectedResult = true, TestName = "IfValueIntPart")]
+    [TestCase("+1,44", ExpectedResult = true, TestName = "IfValueContainsFracPartAndSign")]
+    [TestCase("15,44", ExpectedResult = true, TestName = "IfValueContainsFracPart")]
+    public bool IsValidNumber_ShouldReturnExpectedResult(string value, bool onlyPositive = true)
     {
         var numberValidator = new NumberValidator(4, 2, onlyPositive);
         
-        var actual = numberValidator.IsValidNumber(value);
-        
-        actual.Should().Be(expectedResult);
+        return numberValidator.IsValidNumber(value);
     }
 }
