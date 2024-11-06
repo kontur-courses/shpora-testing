@@ -17,6 +17,8 @@ public class ObjectComparison
 
         actualTsar.Should().BeEquivalentTo(expectedTsar,
             options => options
+                .IgnoringCyclicReferences()
+                .AllowingInfiniteRecursion()
                 .Excluding(memberInfo => memberInfo.Name == nameof(Person.Id) && memberInfo.DeclaringType == typeof(Person)));
     }
 
