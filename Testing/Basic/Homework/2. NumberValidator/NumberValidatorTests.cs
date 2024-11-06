@@ -18,34 +18,30 @@ public class NumberValidatorTests
     [Test]
     public void NumberValidator_Throw_WhenPrecisionIsNegative()
     {
-        Action act = () => new NumberValidator(-1, 2);
-
-        act
-            .Should().Throw<ArgumentException>();
+        NumberValidator_Throw(-1, 2);
     }
 
     [Test]
     public void NumberValidator_Throw_WhenPrecisionIsZero()
     {
-        Action act = () => new NumberValidator(0, 2);
-
-        act
-            .Should().Throw<ArgumentException>();
+        NumberValidator_Throw(0, 2);
     }
 
     [Test]
     public void NumberValidator_Throw_WhenScaleIsNegative()
     {
-        Action act = () => new NumberValidator(1, -1);
-
-        act
-            .Should().Throw<ArgumentException>();
+        NumberValidator_Throw(1, -1);
     }
 
     [Test]
     public void NumberValidator_Throw_WhenPrecisionLessThanScale()
     {
-        Action act = () => new NumberValidator(1, 2);
+        NumberValidator_Throw(1, 2);
+    }
+
+    private void NumberValidator_Throw(int precision, int scale)
+    {
+        Action act = () => new NumberValidator(precision, scale);
 
         act
             .Should().Throw<ArgumentException>();
