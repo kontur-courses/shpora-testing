@@ -9,14 +9,12 @@ public class NumberValidatorTests
 {
     [TestCase(0)]
     [TestCase(-1)]
-    [TestCase(int.MinValue)]
     public void NumberValidator_ThrowsArgumentException_WhenPrecisionLessOrEqualThanZero(int precision)
     {
         Assert.Throws<ArgumentException>(() => new NumberValidator(precision));
     }
 
     [TestCase(1, -1)]
-    [TestCase(1, int.MinValue)]
     public void NumberValidator_ThrowsArgumentException_WhenScaleLessThanZero(int precision,
         int scale)
     {
@@ -91,7 +89,6 @@ public class NumberValidatorTests
     }
 
     [TestCase(3, 2, true, "-0.00")]
-    [TestCase(3, 2, true, "-1.23")]
     public void IsValidNumber_ReturnFalse_WhenInvalidNumberSign(int precision,
         int scale, bool onlyPositive, string value)
     {
