@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
@@ -28,14 +29,9 @@ public class ObjectComparison
         //
         //3. Сообщение об ошибке информативней
         //
-        //Недостатки реализации - я произвел сравнения объектов вложенностью только до 1 Parent,
-        //если потребуется сравнения дальше по уровню вложенности Parent,
-        //то оно тут не выполняется, это недостаток
 
         actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
-            options.Excluding(p => p.Id)
-                .Excluding(p => p.Parent.Id)
-                .Excluding(p => p.Parent.Parent));
+            options.Excluding(p => p.Path.EndsWith("Id")));
     }
 
     [Test]
