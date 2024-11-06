@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
@@ -39,21 +40,19 @@ public class NumberValidatorTests
             .WithMessage("precision must be a positive number");
     }
 
-    [TestCase(2, -1)]
-    [TestCase(1, 2)]
+    [TestCase(2, -1, Description ="Negative Scale")]
+    [TestCase(1, 2, Description ="Scale value is greater than precision value")]
     public void NumberValidator_ExcludesNegativeOrWrongValueScale(int precision, int scale)
     {
         Action numberValidator = () => new NumberValidator(precision, scale);
 
         numberValidator.Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
-        //некорректное сообщение об ошибке в конструкторе NumberValidator, должно быть
-            //"scale must be a non-negative number less than precision"
+            .WithMessage("scale must be a non-negative number less than precision");
     }
     
-    [TestCase(17, 2, true, "")]
-    [TestCase(17, 2, true, null)]
-    public void Check_IsValidNumber_ReturnsFalseIfStringIsNullOrEmpty(int precision, int scale, bool onlyPositive, string number)
+    [TestCase( "", Description = "String.Empty as argument")]
+    [TestCase( null, Description = "null as argument")]
+    public void Check_IsValidNumber_ReturnsFalseIfStringIsNullOrEmpty(string number)
     {
         var result = new NumberValidator(17, 2, true)
             .IsValidNumber(number);
@@ -61,12 +60,12 @@ public class NumberValidatorTests
         result.Should().BeFalse("Пустая строка в качестве аргумента");
     }
     
-    [TestCase(3, 2, true, "-0.00")]
-    [TestCase(17, 2, true, "0.000")]
-    [TestCase(17, 2, true, "a.sd")]
-    public void Check_IsValidNumber_TheCorrectNumberFormat(int precision, int scale, bool onlyPositive, string number)
+    [TestCase( "-0.00")]
+    [TestCase("0.000")]
+    [TestCase( "a.sd")]
+    public void Check_IsValidNumber_TheCorrectNumberFormat( string number)
     {
-        var result = new NumberValidator(precision, scale, onlyPositive)
+        var result = new NumberValidator(17, 2, true)
             .IsValidNumber(number);
 
         result.Should().BeFalse("Неправильный формат числа");
