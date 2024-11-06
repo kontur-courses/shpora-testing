@@ -12,7 +12,7 @@ public class NumberValidatorTests
     [TestCase(int.MinValue)]
     public void NumberValidator_ThrowsArgumentException_WhenPrecisionLessOrEqualThanZero(int precision)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(0));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(precision));
     }
 
     [TestCase(1, -1)]
