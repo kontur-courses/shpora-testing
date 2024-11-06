@@ -3,10 +3,10 @@
 public class TestPersonBuilder
 {
 	private string name = string.Empty;
-	private int age = 0;
-	private int height = 0;
-	private int weight = 0;
-	private Person? parent = null;
+	private int age;
+	private int height;
+	private int weight;
+	private Person? parent;
 
 	private TestPersonBuilder() { }
 
