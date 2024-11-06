@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
@@ -17,10 +18,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-
         actualTsar.Should()
             .BeEquivalentTo(expectedTsar, options => options
-                .Excluding(ctx => ctx.Path.EndsWith("Id")));
+                .Excluding(ctx => ctx.Path.EndsWith("Parent.Id") || ctx.Path == "Id"));
 
         /*
          * Достоинства подхода по сравнению с CheckCurrentTsar_WithCustomEquality
