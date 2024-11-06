@@ -4,7 +4,7 @@ using FluentAssertions;
 using NUnit.Framework.Internal;
 
 namespace HomeExercise.Tasks.ObjectComparison;
-public class ObjectComparison
+public class ObjectComparisonTest
 {
     private static Person ExpectedTsar() => new Person("Ivan IV The Terrible", 54, 170, 70,
         new Person("Vasili III of Russia", 28, 170, 60, null));
@@ -17,8 +17,10 @@ public class ObjectComparison
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
         actualTsar.Should().BeEquivalentTo(ExpectedTsar(), options => options
-            .Excluding(o => o.Id)
-            .Excluding(p => p.Parent.Id));
+            .Excluding(memberInfo =>
+                memberInfo.Name == nameof(Person.Id)
+                && memberInfo.DeclaringType == typeof(Person)));
+
     }
 
     [Test]
