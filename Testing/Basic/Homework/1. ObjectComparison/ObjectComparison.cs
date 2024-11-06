@@ -2,8 +2,25 @@
 using FluentAssertions.Equivalency;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using System;
+using System.Linq.Expressions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
+public static class EquivalencyAssertionOptionsExtensions
+{
+    public static EquivalencyAssertionOptions<TDeclaringType> ExcludeRecursively<TDeclaringType, TPropertyType>
+    (this EquivalencyAssertionOptions<TDeclaringType> congiguration,
+        Expression<Func<TDeclaringType, TPropertyType>> expression)
+    {
+        var memberExpression = (MemberExpression)expression.Body;
+        var propertyName = memberExpression.Member.Name;
+        return congiguration
+            .Excluding(member =>
+                member.DeclaringType == typeof(TDeclaringType)
+                && member.Name.Equals(propertyName));
+    }
+}
 
 public class ObjectComparison
 {
@@ -25,15 +42,8 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         actualTsar.Should().BeEquivalentTo(expectedTsar,
-            ExcludeIdFromPersonClass);
+            c => c.ExcludeRecursively(x => x.Id));
     }
-
-    private EquivalencyAssertionOptions<Person> ExcludeIdFromPersonClass(
-        EquivalencyAssertionOptions<Person> congiguration)
-        => congiguration
-            .Excluding(member =>
-                member.DeclaringType == typeof(Person)
-                && member.Name.Equals(nameof(Person.Id)));
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
