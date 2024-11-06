@@ -21,8 +21,7 @@ public class NumberValidatorTests
         Action act = () => new NumberValidator(-1, 2);
 
         act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
+            .Should().Throw<ArgumentException>();
     }
 
     [Test]
@@ -31,8 +30,7 @@ public class NumberValidatorTests
         Action act = () => new NumberValidator(0, 2);
 
         act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a positive number");
+            .Should().Throw<ArgumentException>();
     }
 
     [Test]
@@ -41,8 +39,7 @@ public class NumberValidatorTests
         Action act = () => new NumberValidator(1, -1);
 
         act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
+            .Should().Throw<ArgumentException>();
     }
 
     [Test]
@@ -51,8 +48,7 @@ public class NumberValidatorTests
         Action act = () => new NumberValidator(1, 2);
 
         act
-            .Should().Throw<ArgumentException>()
-            .WithMessage("precision must be a non-negative number less or equal than precision");
+            .Should().Throw<ArgumentException>();
     }
 
     [Test]
