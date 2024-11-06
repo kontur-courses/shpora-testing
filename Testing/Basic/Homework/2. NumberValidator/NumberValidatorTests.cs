@@ -7,11 +7,11 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-1, 2, true, TestName = "Negative precision throws exception")]
-    [TestCase(0, 2, false, TestName = "Precision equals 0 throws exception")]
-    [TestCase(1, -2, true, TestName = "Negative scale throws exception")]
-    [TestCase(1, 2, false, TestName = "Scale greater than precision throws exception")]
-    [TestCase(1, 1, true, TestName = "Scale equals precision throws exception")]
+    [TestCase(-1, 2, true, TestName = "NumberValidator_WithNegativePrecision_ThrowsException")]
+    [TestCase(0, 2, false, TestName = "NumberValidator_WithPrecisionEqualsZero_ThrowsException")]
+    [TestCase(1, -2, true, TestName = "NumberValidator_WithNegativeScale_ThrowsException")]
+    [TestCase(1, 2, false, TestName = "NumberValidator_WithScaleGreaterThanPrecision_ThrowsException")]
+    [TestCase(1, 1, true, TestName = "NumberValidator_WithScaleEqualsPrecision_ThrowsException")]
     public void NumberValidation_ConstructorThrowsArgumentException(int precision, int scale, bool onlyPositive)
     {
         var action = () => new NumberValidator(precision, scale, onlyPositive);
@@ -19,7 +19,7 @@ public class NumberValidatorTests
         action.Should().Throw<ArgumentException>();
     }
 
-    [Test(Description = "Creating an instance of a class with the correct parameters should not throw an exception")]
+    [Test(Description = "NumberValidator_WithCorrectParameters_NotThrowException")]
     public void NumberValidation_ConstructorDoesNotHaveArgumentException()
     {
         var action = () => new NumberValidator(1, 0, true);
@@ -27,44 +27,53 @@ public class NumberValidatorTests
         action.Should().NotThrow();
     }
 
-    [TestCaseSource(nameof(TestCase1))]
-    [TestCaseSource(nameof(TestCase2))]
+    [TestCaseSource(nameof(ValidNumbersCases))]
+    [TestCaseSource(nameof(InvalidNumbersCases))]
+    [TestCaseSource(nameof(InvalidInputCases))]
     public bool IsValidNumber_WorksCorrectly(int precision, int scale, bool onlyPositive, string value)
     {
         return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(value);
     }
 
-    public static IEnumerable TestCase1
+    public static IEnumerable ValidNumbersCases
     {
         get
         {
-            yield return new TestCaseData(1, 0, true, "0").SetName("Validation of zero with the correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(2, 1, true, "0.0").SetName("Validation of zero with a zero fractional part separated by a dot with the correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(2, 1, true, "0.1").SetName("Validation of zero with a non-zero fractional part separated by a dot with correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(2, 1, true, "0,1").SetName("Validation of zero with a non-zero decimal part separated by a comma with correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(2, 0, true, "+1").SetName("Validation of a positive integer with an explicit plus sign with correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(3, 1, true, "+1.1").SetName("Validation of a positive number with a non-zero fractional part separated by a dot and an explicit plus sign with the correct parameters must be completed successfully").Returns(true);
-            yield return new TestCaseData(3, 1, true, "+1,1").SetName("Validation of a positive number with a non-zero fractional part separated by a comma and an explicit plus sign with the correct parameters must be completed successfully").Returns(true);
-            yield return new TestCaseData(2, 0, false, "-1").SetName("Validation of a negative integer with an explicit minus sign with correct parameters should be completed successfully").Returns(true);
-            yield return new TestCaseData(3, 1, false, "-1.1").SetName("Validation of a negative number with a non-zero fractional part separated by a dot and an explicit minus sign with the correct parameters must be completed successfully").Returns(true);
-            yield return new TestCaseData(3, 1, false, "-1,1").SetName("Validation of a negative number with a non-zero fractional part separated by a comma and an explicit minus sign with the correct parameters must be completed successfully").Returns(true);
-            yield return new TestCaseData(7, 2, true, "671,23").SetName("Validation a real number with a non-zero fractional part separated by a comma with the correct parameters must be completed successfully").Returns(true);
+            yield return new TestCaseData(1, 0, true, "0").SetName("ForZero_WithCorrectParams_ReturnTrue").Returns(true);
+            yield return new TestCaseData(2, 1, true, "0.0").SetName("ForZero_WithZeroFractionalPartAndDot_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(2, 1, true, "0.1").SetName("ForZero_WithNonZeroFractionalPartAndDot_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(2, 1, true, "0,1").SetName("ForZero_WithNonZeroDecimalPartAndComma_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(2, 0, true, "+1").SetName("ForPositiveInteger_WithSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(3, 1, true, "+1.1").SetName("ForPositiveDecimal_WithDotAndSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(3, 1, true, "+1,1").SetName("ForPositiveDecimal_WithCommaAndSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(2, 0, false, "-1").SetName("ForNegativeInteger_WithSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(3, 1, false, "-1.1").SetName("ForNegativeDecimal_WithDotAndSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(3, 1, false, "-1,1").SetName("ForNegativeDecimal_WithCommaAndSign_ReturnTrueOnCorrectParams").Returns(true);
+            yield return new TestCaseData(7, 2, true, "671,23").SetName("ForRealDecimal_WithCorrectParameters_ReturnTrue").Returns(true);
         }
     }
 
-    public static IEnumerable TestCase2
+    public static IEnumerable InvalidNumbersCases
     {
         get
         {
-            yield return new TestCaseData(2, 0, true, "").SetName("Empty string is not allowed").Returns(false);
-            yield return new TestCaseData(2, 1, true, ".0").SetName("Integer part of a real number must be").Returns(false);
-            yield return new TestCaseData(2, 0, true, "0.").SetName("Fractional part of a real number must be if a separator character is used").Returns(false);
-            yield return new TestCaseData(2, 0, true, "-1").SetName("If a minus is explicitly specified, onlyPositive must be false").Returns(false);
-            yield return new TestCaseData(10, 2, true, "abcde.f").SetName("Use only digits").Returns(false);
-            yield return new TestCaseData(10, 9, true, "127.0.0.1").SetName("Only real numbers format").Returns(false);
-            yield return new TestCaseData(3, 2, true, "4321.5").SetName("If precision is less than number of digits in the number, return false").Returns(false);
-            yield return new TestCaseData(3, 0, true, "+145").SetName("If a plus is explicitly specified, it must be taken into account when calculating precision").Returns(false);
-            yield return new TestCaseData(3, 0, false, "-124").SetName("If a minus is explicitly specified, it must be taken into account when calculating precision").Returns(false);
+            yield return new TestCaseData(2, 0, true, "-1").SetName("ForNegativeInteger_WithMinusSign_OnlyPositiveIsFalse").Returns(false);
+            yield return new TestCaseData(3, 2, true, "4321.5").SetName("ForDecimal_WithIncorrectPrecision_ReturnFalse").Returns(false);
+            yield return new TestCaseData(3, 0, true, "+145").SetName("ForPositiveDecimal_WithPlusSign_PrecisionCalculationAccountPlusSign").Returns(false);
+            yield return new TestCaseData(3, 0, false, "-124").SetName("ForNegativeDecimal_WithMinusSign_PrecisionCalculationAccountMinusSign").Returns(false);
+        }
+    }
+
+    public static IEnumerable InvalidInputCases
+    {
+        get
+        {
+            yield return new TestCaseData(10, 9, true, "127.0.0.1").SetName("ForNumber_WithNonRealNumberFormat_ReturnFalse").Returns(false);
+            yield return new TestCaseData(2, 0, true, "").SetName("ForNumber_IsEmptyString_ReturnFalse").Returns(false);
+            yield return new TestCaseData(2, 1, true, ".0").SetName("ForNumber_WithMissingIntegerPart_ReturnFalse").Returns(false);
+            yield return new TestCaseData(2, 0, true, "0.").SetName("ForNumber_WithMissingFractionalPart_ReturnFalse").Returns(false);
+            yield return new TestCaseData(10, 2, true, "abcde.f").SetName("ForNumber_WithNonDigitCharacters_ReturnFalse").Returns(false);
+
         }
     }
 }
