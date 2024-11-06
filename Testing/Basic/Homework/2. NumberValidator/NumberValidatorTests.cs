@@ -67,7 +67,7 @@ public class NumberValidatorTests
     [TestCase("0o44", 4, 0, true, TestName = "0o44 should be invalid number")]
     [TestCase("0b1010", 6, 0, true, TestName = "0b1010 should be invalid number")]
     [TestCase("0b01110.01010", 10, 5, true, TestName = "0b01110.1010 should be invalid number")]
-    [TestCase("seven.eleven", 17, 10, false, TestName = "seven eleven should be invalid number")]
+    [TestCase("seven.eleven", 17, 10, false, TestName = "seven.eleven should be invalid number")]
     [TestCase("five/two", 17, 10, false, TestName = "five/two should be invalid number")]
     [TestCase("11.11.11", 17, 10, false, TestName = "11.11.11 should be invalid number")]
     [TestCase("+127.000.001", 17, 10, false, TestName = "127.000.001 should be invalid number")]
