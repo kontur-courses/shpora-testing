@@ -96,20 +96,11 @@ public class NumberValidatorTests
         return validator.IsValidNumber(value);
     }
 
-    [TestCase(3, 2, true, "+1.23", ExpectedResult = true)]
-    [TestCase(3, 2, true, "1.23", ExpectedResult = true)]
-    //  Я думаю, что в данном задании подразумивается,
-    //  что NumberValidator корректен.
-    //  Тогда цитирую:
-    //  "Формат числового значения указывается в виде N(m.к),
-    //  где m – максимальное количество знаков в числе,
-    //  включая знак (для отрицательного числа),".
-    //  В моём понимании,исходя из документации в IsValidNumber,
-    //  тест со значением "+1.23" должен
-    //  возвращать true, так как +1.23 это положительное число,
-    //  а знак включаться в длину должен только у отрицательного числа.
-    //  Я не так понял?
-    public bool IsValidNumber_ReturnTrue_WhenGivenCorrectPositiveValue(int precision,
+    [TestCase(3, 2, true, "+1.23", ExpectedResult = false)]
+    [TestCase(4, 2, true, "+1.23", ExpectedResult = true)]
+    [TestCase(3, 2, false, "-1.23", ExpectedResult = false)]
+    [TestCase(4, 2, false, "-1.23", ExpectedResult = true)]
+    public bool IsValidNumber_InvolvesSignInLengthCalculation(int precision,
         int scale, bool onlyPositive, string value)
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
