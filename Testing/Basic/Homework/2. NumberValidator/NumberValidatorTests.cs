@@ -13,13 +13,15 @@ public class NumberValidatorTests
     [TestCase(-1, 2, true)]
     [TestCase(-3, 2, false)]
     [TestCase(0, 2, true)]
-    public void ArgumentException_When_WrongPrecision(int precision, int scale, bool onlyPositive)
+    public void NumberValidator_WithInvalidPrecision_ShouldThrowArgumentException(int precision, 
+        int scale, bool onlyPositive)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive), 
+            "precision must be a positive number");
     }
 
     [Test]
-    public void DoNotThrowArgumentException_When_ScaleIsZero()
+    public void NumberValidator_WhenScaleIsZero_DoNotThrowArgumentException()
     {
         Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
     }
@@ -27,15 +29,18 @@ public class NumberValidatorTests
     [TestCase(17, -1, true)]
     [TestCase(17, 17, true)]
     [TestCase(17, 18, true)]
-    public void ArgumentException_When_NotValidScale(int precision, int scale, bool onlyPositive)
+    public void NumberValidator_WhenNotValidScale_ShouldThrowArgumentException(int precision,
+        int scale, bool onlyPositive)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive));
+        Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale, onlyPositive),
+            "precision must be a non-negative number less or equal than precision");
     }
 
     [TestCase(6, 3, true)]
     [TestCase(6, 3, false)]
     [TestCase(10, 9, false)]
-    public void DoNotThrowArgumentException_When_ValidArguments(int precision, int scale, bool onlyPositive)
+    public void NumberValidator_WhenValidArguments_DoNotThrowArgumentException(int precision,
+        int scale, bool onlyPositive)
     {
         Assert.DoesNotThrow(() => new NumberValidator(precision, scale, onlyPositive));
     }
