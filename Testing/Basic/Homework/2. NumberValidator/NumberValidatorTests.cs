@@ -7,7 +7,6 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
     [TestCase(0)]
     [TestCase(-1)]
     [TestCase(int.MinValue)]
@@ -16,7 +15,6 @@ public class NumberValidatorTests
         Assert.Throws<ArgumentException>(() => new NumberValidator(0));
     }
 
-    [Test]
     [TestCase(1, -1)]
     [TestCase(1, int.MinValue)]
     public void NumberValidator_ThrowsArgumentException_WhenScaleLessThanZero(int precision,
@@ -25,7 +23,6 @@ public class NumberValidatorTests
         Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale));
     }
 
-    [Test]
     [TestCase(1, 1)]
     [TestCase(1, 2)]
     public void NumberValidator_ThrowsArgumentException_WhenScaleMoreOrEqualThanPrecision(int precision,
@@ -34,7 +31,6 @@ public class NumberValidatorTests
         Assert.Throws<ArgumentException>(() => new NumberValidator(precision, scale));
     }
 
-    [Test]
     [TestCase(17, 2, true, null)]
     [TestCase(17, 2, true, "")]
     [TestCase(17, 2, true, " ")]
@@ -45,7 +41,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == false);
     }
 
-    [Test]
     [TestCase(17, 2, true, "0.0")]
     [TestCase(17, 2, true, "0")]
     [TestCase(4, 2, true, "+1.23")]
@@ -56,7 +51,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == true);
     }
 
-    [Test]
     [TestCase(17, 2, true, "0,0")]
     public void IsValidNumber_ReturnTrue_WhenGivenCorrectValuesWithComma(int precision,
         int scale, bool onlyPositive, string value)
@@ -65,7 +59,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == true);
     }
 
-    [Test]
     [TestCase(17, 2, true, "a.sd")]
     [TestCase(17, 2, true, "1..2")]
     [TestCase(17, 2, true, "1.2.3")]
@@ -79,7 +72,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == false);
     }
 
-    [Test]
     [TestCase(3, 2, true, "00.00")]
     [TestCase(3, 0, true, "0.000")]
     [TestCase(3, 2, false, "-1.23")]
@@ -90,7 +82,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == false);
     }
 
-    [Test]
     [TestCase(17, 2, true, "0.000")]
     public void IsValidNumber_ReturnFalse_WhenScaleIsExceeded(int precision,
         int scale, bool onlyPositive, string value)
@@ -99,7 +90,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == false);
     }
 
-    [Test]
     [TestCase(3, 2, true, "-0.00")]
     [TestCase(3, 2, true, "-1.23")]
     public void IsValidNumber_ReturnFalse_WhenInvalidNumberSign(int precision,
@@ -109,7 +99,6 @@ public class NumberValidatorTests
         Assert.That(validator.IsValidNumber(value) == false);
     }
 
-    [Test]
     [TestCase(3, 2, true, "+1.23")]
     [TestCase(3, 2, true, "1.23")]
     //  Я думаю, что в данном задании подразумивается,
