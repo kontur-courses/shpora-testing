@@ -15,9 +15,9 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        actualTsar.Should().BeEquivalentTo(expectedTsar, properties => properties
-            .Excluding(person => person.Id)
-            .Excluding(person => person.Parent.Id));
+        actualTsar.Should().BeEquivalentTo(expectedTsar, properties =>
+                    properties.Excluding(o => o.Name == "Id" && 
+                    o.DeclaringType == typeof(Person)).IgnoringCyclicReferences());
     }
 
     [Test]
@@ -31,11 +31,12 @@ public class ObjectComparison
         /* Данное решение имеет следующие недостатки:
             При добавлении новых свойств в класс Person придётся вручную обновлять метод AreEqual и
             включать новое свойство в сравнение, что сделает код очень громоздким и замедлит разработку.
-            В целом, используя собственный метод AreEqual, мы уменьшаем читаемость (особенно если подобных тестов и методов станет много,
-            а разбираться в этом будет сторонний разработчик), а также
-            отказываемся от более информативной обработки исключений FluentAssertions (можем увидеть, какое конкретное поле не совпало, 
-            а не просто получим возврат false) 
-            Таким образом моё решение является более устойчивым к изменениям, читабельным и поддерживаемым по сравнению с данным.
+            В целом, используя собственный метод AreEqual, мы уменьшаем читаемость (особенно если подобных тестов
+            и методов станет много, а разбираться в этом будет сторонний разработчик), а также
+            отказываемся от более информативной обработки исключений FluentAssertions (можем увидеть, 
+            какое конкретное поле не совпало, а не просто получим возврат false) 
+            Таким образом моё решение является более устойчивым к изменениям, читабельным и 
+            поддерживаемым по сравнению с данным.
         */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }

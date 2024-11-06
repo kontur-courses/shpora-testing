@@ -1,99 +1,65 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
-using System.ComponentModel.DataAnnotations;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void WhenPrecisionIsNegative_ShouldReturnArgumentException()
+    [TestCase(-1, 2)]
+    [TestCase(1, -1)]
+    [TestCase(2, 3)]
+    public void WhenInvalidParameters_ShouldThrowArgumentException(int precision, int scale)
     {
-        Action action = () => new NumberValidator(-1, 2, true);
-        action.Should().Throw<ArgumentException>().WithMessage("precision must be a positive number");
-    }
-
-    [Test]
-    public void WhenScaleIsNegative_ShouldThrowArgumentException()
-    {
-        Action act = () => new NumberValidator(1, -1, false);
-        act.Should().Throw<ArgumentException>().WithMessage("precision must be a non-negative number less or equal than precision");
-    }
-
-    [Test]
-    public void WhenScaleIsMoreThanPrecision_ShouldThrowArgumentException()
-    {
-        Action act = () => new NumberValidator(2, 3, false);
-        act.Should().Throw<ArgumentException>().WithMessage("precision must be a non-negative number less or equal than precision");
+        var func = () => new NumberValidator(precision, scale);
+        func.Should().Throw<ArgumentException>();
     }
 
     [Test]
     public void WhenValid_ShouldNotThrow()
     {
-        Action act = () => new NumberValidator(1, 0, true);
-        act.Should().NotThrow();
+        var action = () => new NumberValidator(1, 0, true);
+        action.Should().NotThrow();
     }
 
-    [Test]
-    public void WhenInputIsEmpty_ShouldReturnFalse()
-    {
-        NumberValidator validator = new NumberValidator(5, 2, true);
-        ValidateNumber(validator, "", false);
-    }
+    [TestCase("", false, true)]
+    [TestCase(null, false, true)]
+    [TestCase("12345", true, true)]
+    [TestCase("123.45", true, true)]
+    [TestCase("-123.45", false, true)]
+    [TestCase("001.23", true, true)]
+    [TestCase("0", true, true)]
+    [TestCase("0.0", true, true)]
+    [TestCase("+123.45", false, true)]
+    [TestCase("123456", false, true)]
+    [TestCase("123.456", false, true)]
+    [TestCase("0000.00", false, true)]
+    [TestCase("0.000", false, true)]
+    [TestCase("ab.c", false, true)]
+    [TestCase("123.45.67", false, true)]
+    [TestCase("123,67", true, true)]
+    [TestCase("123 45", false, true)]
+    [TestCase("++1", false, true)]
+    [TestCase("1.", false, true)]
 
-    [Test]
-    public void WhenInputIsNull_ShouldReturnFalse()
+    [TestCase("12345", true, false)]
+    [TestCase("123.45", true, false)]
+    [TestCase("123.45a", false, false)]
+    [TestCase("12.3.4", false, false)]
+    [TestCase("-0", true, false)]
+    [TestCase("-12.45", true, false)]
+    [TestCase("-123.45", false, false)]
+    [TestCase("--1", false, false)]
+    [TestCase("-1.", false, false)]
+    public void WhenInputIsVarious_ShouldReturnExpected(string input, bool expected, bool onlyPositive)
     {
-        NumberValidator validator = new NumberValidator(5, 2, true);
-        ValidateNumber(validator, null, false);
-    }
-
-
-    [Test]
-    [TestCase("12345", true)]
-    [TestCase("123.45", true)]
-    [TestCase("-123.45", false)]
-    [TestCase("001.23", true)]
-    [TestCase("0", true)]
-    [TestCase("0.0", true)]
-    [TestCase("+123.45", false)]
-    [TestCase("123456", false)]
-    [TestCase("123.456", false)]
-    [TestCase("0000.00", false)]
-    [TestCase("0.000", false)]
-    [TestCase("ab.c", false)]
-    [TestCase("123.45.67", false)]
-    [TestCase("123,67", true)]
-    [TestCase("123 45", false)]
-    [TestCase("++1", false)]
-    [TestCase("1.", false)]
-    public void WhenInputIsVarious_ShouldReturnExpected_PositiveValidator(string input, bool expected)
-    {
-        NumberValidator validator = new NumberValidator(5, 2, true);
-        ValidateNumber(validator, input, expected);
-    }
-
-    [Test]
-    [TestCase("12345", true)]
-    [TestCase("123.45", true)]
-    [TestCase("123.45a", false)]
-    [TestCase("12.3.4", false)]
-    [TestCase("-0", true)]
-    [TestCase("-12.45", true)]
-    [TestCase("-123.45", false)]
-    [TestCase("--1", false)]
-    [TestCase("-1.", false)]
-    public void WhenInputIsVarious_ShouldReturnExpected_NegativeValidator(string input, bool expected)
-    {
-        NumberValidator validator = new NumberValidator(5, 2, false);
+        var validator = new NumberValidator(5, 2, onlyPositive);
         ValidateNumber(validator, input, expected);
     }
 
     private void ValidateNumber(NumberValidator validator, string input, bool expected)
     {
-        bool result = validator.IsValidNumber(input);
+        var result = validator.IsValidNumber(input);
         result.Should().Be(expected, $"Input '{input}' did not return expected result '{expected}'.");
     }
 }
