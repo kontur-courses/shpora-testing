@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
@@ -13,17 +14,9 @@ public class ObjectComparison
 
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(p => p.Name == nameof(Person.Id) && p.DeclaringType == typeof(Person)));
     }
 
     [Test]
@@ -36,6 +29,9 @@ public class ObjectComparison
 
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
+        // Нужно писать сам предикат AreEqual (лишний код в котором можно ошибиться)
+        // + его надо поддерживать (при расширении класса Person нужно менять логику AreEqual)
+        // В AreEqual нет Assert, значит при падении теста не будет информации о том как упал тест (причина падения)
     }
 
     private bool AreEqual(Person? actual, Person? expected)
