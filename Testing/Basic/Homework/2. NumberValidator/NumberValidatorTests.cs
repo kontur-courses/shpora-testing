@@ -51,6 +51,7 @@ public class NumberValidatorTests
     }
 
     [TestCase(4, 3, true, " ")]
+    [TestCase(4, 3, true, null)]
     public void IsValidNumber_NullOrWhitespaces_ShouldReturnFalse(int precision, int scale, bool onlyPositive,
         string input)
     {
