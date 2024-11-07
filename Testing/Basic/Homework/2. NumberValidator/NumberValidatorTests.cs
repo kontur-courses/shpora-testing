@@ -6,6 +6,9 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
+    private const string PrecisionOutOfRangeMessage = "precision must be a positive number";
+    private const string ScaleOutOfRangeMessage = "scale must be a non-negative number less than precision";
+
     [TestCase(0)]
     [TestCase(-1)]
     [TestCase(int.MinValue)]
@@ -14,7 +17,7 @@ public class NumberValidatorTests
         int precision)
     {
         var constructor = () => new NumberValidator(precision);
-        constructor.Should().Throw<ArgumentException>();
+        constructor.Should().Throw<ArgumentException>().WithMessage(PrecisionOutOfRangeMessage);
     }
 
     [TestCase(-1)]
@@ -24,7 +27,7 @@ public class NumberValidatorTests
         int scale)
     {
         var constructor = () => new NumberValidator(1, scale);
-        constructor.Should().Throw<ArgumentException>();
+        constructor.Should().Throw<ArgumentException>().WithMessage(ScaleOutOfRangeMessage);
     }
 
     [TestCase(1, 2)]
@@ -35,7 +38,7 @@ public class NumberValidatorTests
         int scale)
     {
         var constructor = () => new NumberValidator(precision, scale);
-        constructor.Should().Throw<ArgumentException>();
+        constructor.Should().Throw<ArgumentException>().WithMessage(ScaleOutOfRangeMessage);
     }
 
     [TestCase(10, 5)]
