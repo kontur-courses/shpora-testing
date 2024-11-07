@@ -67,7 +67,7 @@ public class NumberValidatorTests
     [TestCase("0b1010", 6, 0, true, TestName = "When value is 1010 and is binary number")]
     [TestCase("0b01110.01010", 10, 5, true, TestName = "When value is binary number with fraction")]
     [TestCase("seven.eleven", 17, 10, false, TestName = "When value is two english words separated by dot")]
-    [TestCase("five/two", 17, 10, false, TestName = "When value is two english words separated by dot")]
+    [TestCase("five/two", 17, 10, false, TestName = "When value is two english words separated by /")]
     [TestCase("11.11.11", 17, 10, false, TestName = "When value has three dots")]
     [TestCase("+127.000.001", 17, 10, false, TestName = "When value has three dots and sign")]
     [TestCase("11.22,33", 17, 10, false, TestName = "When value has one dot and one comma")]
