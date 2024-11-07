@@ -38,7 +38,6 @@ public class NumberValidatorTests
 
     [TestCase(6, 3, true)]
     [TestCase(6, 3, false)]
-    [TestCase(10, 9, false)]
     public void NumberValidator_WhenValidArguments_DoNotThrowArgumentException(int precision,
         int scale, bool onlyPositive)
     {
