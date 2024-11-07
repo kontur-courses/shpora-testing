@@ -31,7 +31,7 @@ public class ObjectComparison
         //
 
         actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
-            options.Excluding(p => p.Path.EndsWith("Id")));
+            options.Excluding((IMemberInfo info) => info.Name == "Id"));
     }
 
     [Test]
