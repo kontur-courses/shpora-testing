@@ -91,7 +91,7 @@ public class NumberValidatorTests
     [TestCase("0.00", 5, 1, true, TestName = "When value is fraction with 2 digit in fraction part and scale is 1 (Not 2)")]
     [TestCase("52", 1, 0, true, TestName = "When value is 2 digit integer and precision is 1 (Not 2)")]
     [TestCase("-300", 3, 0, false, TestName = "When value is 3 digit integer with negative sign and precision is 3 (Not 4)")]
-    [TestCase("300", 2, 0, false, TestName = "When value is 3 digit integer and precision is 2")] 
+    [TestCase("300", 2, 0, false, TestName = "When value is 3 digit integer and precision is 2 (Not 3)")] 
     [TestCase("+100", 3, 0, false, TestName = "When value is 3 digit integer with positive sign and precision is 3 (Not 4)")] 
     [TestCase("-1.23", 3, 2, false, TestName = "When value is 3 digit fraction with negative sign and precision is 3 (Not 4)")]
     [TestCase("-1234567890.1234567890", 20, 10, false, TestName = "When value is 20 digit fraction with negative sign and precision is 20 (Not 21)")]
