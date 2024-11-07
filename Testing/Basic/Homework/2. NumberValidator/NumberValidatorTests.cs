@@ -19,23 +19,32 @@ public class NumberValidatorShould
         createNumberValidator.Should().Throw<ArgumentException>();
     }
 
-    [TestCase(3, 2, true, "00.00", ExpectedResult = false)]
-    [TestCase(3, 2, true, "+1.23", ExpectedResult = false)]
-    [TestCase(3, 2, true, "a.sd", ExpectedResult = false)]
-    [TestCase(17, 2, true, "+.00", ExpectedResult = false)]
-    [TestCase(17, 2, true, "0.0a", ExpectedResult = false)]
-    [TestCase(17, 2, true, "a0.0", ExpectedResult = false)]
-    [TestCase(17, 2, true, "0.000", ExpectedResult = false)]
-    [TestCase(17, 2, true, "", ExpectedResult = false)]
-    [TestCase(17, 2, true, null, ExpectedResult = false)]
-    [TestCase(17, 2, true, "0.0", ExpectedResult = true)]
-    [TestCase(17, 2, null, "0.0", ExpectedResult = true)]
-    [TestCase(17, 2, true, "0,0", ExpectedResult = true)]
-    [TestCase(17, 2, true, "0", ExpectedResult = true)]
-    [TestCase(4, 2, true, "+1.23", ExpectedResult = true)]
-    [TestCase(4, 2, false, "-1.23", ExpectedResult = true)]
-    public bool IsValid_ReturnResult_AfterExecuting(int precision, int scale, bool onlyPositive, string str)
+    [TestCase(3, 2, true, "00.00")]
+    [TestCase(3, 2, true, "+1.23")]
+    [TestCase(3, 2, true, "a.sd")]
+    [TestCase(17, 2, true, "+.00")]
+    [TestCase(17, 2, true, "0.0a")]
+    [TestCase(17, 2, true, "a0.0")]
+    [TestCase(17, 2, true, "0.000")]
+    [TestCase(17, 2, true, "")]
+    [TestCase(17, 2, true, null)]
+    public void IsValidNumber_ReturnFalse_AfterExecutingWith(int precision, int scale, bool onlyPositive, string str)
     {
-        return new NumberValidator(precision, scale, onlyPositive).IsValidNumber(str);
+        var validator = new NumberValidator(precision, scale, onlyPositive);
+
+        validator.IsValidNumber(str).Should().BeFalse();
+    }
+
+    [TestCase(17, 2, true, "0.0")]
+    [TestCase(17, 2, null, "0.0")]
+    [TestCase(17, 2, true, "0,0")]
+    [TestCase(17, 2, true, "0")]
+    [TestCase(4, 2, true, "+1.23")]
+    [TestCase(4, 2, false, "-1.23")]
+    public void IsValidNumber_ReturnTrue_AfterExecutingWith(int precision, int scale, bool onlyPositive, string str)
+    {
+        var validator = new NumberValidator(precision, scale, onlyPositive);
+            
+        validator.IsValidNumber(str).Should().BeTrue();
     }
 }
