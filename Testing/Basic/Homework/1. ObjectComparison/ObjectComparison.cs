@@ -26,11 +26,6 @@ public class ObjectComparison
         actualTsar.Should()
             .BeEquivalentTo(expectedTsar, options => options.Excluding(ctx => ComparePerson(ctx)));
 
-
-
-        //.Using<Person>(ctx => ctx.Subject
-        //   .Should().BeEquivalentTo(ctx.Expectation, opt => opt.Excluding(x => x.Id))).WhenTypeIs<Person>());s
-
         /*
          * Достоинства подхода по сравнению с CheckCurrentTsar_WithCustomEquality
          * 1. В случае падения теста в сообщении прописывается место несовпадения, ожидаемый результат и полученный результат.
