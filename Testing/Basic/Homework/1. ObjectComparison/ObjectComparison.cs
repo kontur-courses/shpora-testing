@@ -1,12 +1,17 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
+using Homework._1._ObjectComparison;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 
 public class ObjectComparison
 {
+    
     [Test]
     [Description("Проверка текущего царя")]
     [Category("ToRefactor")]
@@ -19,8 +24,12 @@ public class ObjectComparison
 
         // Перепишите код на использование Fluent Assertions.
         actualTsar.Should()
-            .BeEquivalentTo(expectedTsar, options => options
-                .Excluding(ctx => ctx.Path.EndsWith("Parent.Id") || ctx.Path == "Id"));
+            .BeEquivalentTo(expectedTsar, options => options.Excluding(ctx => ComparePerson(ctx)));
+
+
+
+        //.Using<Person>(ctx => ctx.Subject
+        //   .Should().BeEquivalentTo(ctx.Expectation, opt => opt.Excluding(x => x.Id))).WhenTypeIs<Person>());s
 
         /*
          * Достоинства подхода по сравнению с CheckCurrentTsar_WithCustomEquality
@@ -30,6 +39,16 @@ public class ObjectComparison
          * 4. Тест стал более читаемым
          */
     }
+
+    private bool ComparePerson(IMemberInfo ctx)
+    {
+        var parentInfo = ctx.GetType()
+            ?.GetField("member", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.GetValue(ctx) as Field;
+
+        return parentInfo?.ParentType == typeof(Person) && ctx.Path.EndsWith("Id");
+    }
+
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
