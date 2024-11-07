@@ -9,8 +9,7 @@ public class NumberValidatorTests
     [TestCase(0)]
     [TestCase(-1)]
     [TestCase(int.MinValue)]
-    [Description("Конструктор бросает исключение, "
-        + "если precision меньше или равен 0")]
+    [Description("Конструктор бросает исключение, если precision меньше или равен 0")]
     public void Constructor_ThrowsException_WhenPrecisionIsNotPositive(
         int precision)
     {
@@ -30,8 +29,7 @@ public class NumberValidatorTests
 
     [TestCase(1, 2)]
     [TestCase(2, 2)]
-    [Description("Конструктор бросает исключение, "
-        + "если scale больше или равен precision")]
+    [Description("Конструктор бросает исключение, если scale больше или равен precision")]
     public void Constructor_ThrowsException_WhenScaleIsGreaterThanOrEqualToPrecision(
         int precision,
         int scale)
@@ -58,27 +56,22 @@ public class NumberValidatorTests
     {
         var numberValidator = new NumberValidator(10);
 
-        numberValidator.IsValidNumber("1")
-            .Should().BeTrue();
-        numberValidator.IsValidNumber("1.1")
-            .Should().BeFalse();
+        numberValidator.IsValidNumber("1").Should().BeTrue();
+        numberValidator.IsValidNumber("1.1").Should().BeFalse();
     }
 
     [Test]
-    [Description("Работает с отрицательными числами, "
-        + "если в конструкторе не указано обратное")]
-    public void IsValid_ValidatesBothPositiveAndNegativeNumbers_IfNotDisabledInConstructor()
+    [Description("Работает с отрицательными числами, если в конструкторе не указано обратное")]
+    public void IsValidNumber_ValidatesNegativeNumbers_IfNotDisabledInConstructor()
     {
         var numberValidator = new NumberValidator(20, 10);
 
-        numberValidator.IsValidNumber("-1")
-            .Should().BeTrue();
-        numberValidator.IsValidNumber("-1.1")
-            .Should().BeTrue();
+        numberValidator.IsValidNumber("-1").Should().BeTrue();
+        numberValidator.IsValidNumber("-1.1").Should().BeTrue();
     }
 
     [Test, Combinatorial]
-    [Description("Подходящие целые числа")]
+    [Description("Возвращает true, если строка - удовлетворяющее ограничениям целое число")]
     public void IsValidNumber_ReturnsTrue_IfIntegerNumberIsValid(
         [Values("", "-", "+")] string sign,
         [Values("0", "1", "1234567890", "00", "01")] string number)
@@ -86,12 +79,11 @@ public class NumberValidatorTests
         number = sign + number;
         var numberValidator = new NumberValidator(number.Length, 0, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeTrue();
+        numberValidator.IsValidNumber(number).Should().BeTrue();
     }
 
     [Test, Combinatorial]
-    [Description("Подходящие числа с дробной частью")]
+    [Description("Возвращает true, если строка - удовлетворяющее ограничениям число с дробной частью")]
     public void IsValidNumber_ReturnsTrue_IfNumberWithFractionalPartIsValid(
         [Values("", "-", "+")] string sign,
         [Values("0", "1", "1234567890", "00", "01")] string intPart,
@@ -99,13 +91,10 @@ public class NumberValidatorTests
         [Values("0", "1", "1234567890", "00", "01")] string fracPart)
     {
         var number = sign + intPart + decimalPoint + fracPart;
-        var numberValidator = new NumberValidator(
-            sign.Length + intPart.Length + fracPart.Length,
-            fracPart.Length,
-            false);
+        var precision = sign.Length + intPart.Length + fracPart.Length;
+        var numberValidator = new NumberValidator(precision, fracPart.Length, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeTrue();
+        numberValidator.IsValidNumber(number).Should().BeTrue();
     }
 
     [TestCase(1, 0, "00")]
@@ -115,7 +104,7 @@ public class NumberValidatorTests
     [TestCase(2, 1, "-1.1")]
     [TestCase(2, 1, "11.1")]
     [TestCase(3, 1, "-11.1")]
-    [Description("Много знаков в целой части числа")]
+    [Description("Возвращает false, если у числа много знаков в целой части")]
     public void IsValidNumber_ReturnsFalse_IfTooManyDigits(
         int precision,
         int scale,
@@ -123,15 +112,14 @@ public class NumberValidatorTests
     {
         var numberValidator = new NumberValidator(precision, scale, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator.IsValidNumber(number).Should().BeFalse();
     }
 
     [TestCase(2, 0, "0.0")]
     [TestCase(3, 1, "0.00")]
     [TestCase(2, 0, "1.1")]
     [TestCase(3, 1, "1.11")]
-    [Description("Много знаков в дробной части числа")]
+    [Description("Возвращает false, если у числа много знаков в дробной части")]
     public void IsValidNumber_ReturnsFalse_IfTooManyDigitsInFractionalPart(
         int precision,
         int scale,
@@ -139,36 +127,30 @@ public class NumberValidatorTests
     {
         var numberValidator = new NumberValidator(precision, scale, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator.IsValidNumber(number).Should().BeFalse();
     }
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
     [TestCase("   ")]
-    [Description("Null и пробелы")]
+    [Description("Возвращает false, если строка null или состоит из пробелов")]
     public void IsValidNumber_ReturnsFalse_IfStringIsNullOrWhitespace(
         string number)
     {
         var numberValidator = new NumberValidator(10, 9, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator.IsValidNumber(number).Should().BeFalse();
     }
 
     [TestCaseSource(nameof(GetNotNumbers))]
-    [Description("Не число")]
+    [Description("Возвращает false, если строка не является числом")]
     public void IsValidNumber_ReturnsFalse_IfNotNumber(
         string number)
     {
-        var numberValidator = new NumberValidator(
-            number.Length,
-            number.Length - 1,
-            false);
+        var numberValidator = new NumberValidator(number.Length, number.Length - 1, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator.IsValidNumber(number).Should().BeFalse();
     }
 
     [TestCase("-0")]
@@ -178,13 +160,9 @@ public class NumberValidatorTests
     public void IsValidNumber_ReturnsFalse_IfNumberIsNegativeAndNegativeNumbersDisabled(
         string number)
     {
-        var numberValidator = new NumberValidator(
-            number.Length,
-            number.Length - 1,
-            true);
+        var numberValidator = new NumberValidator(number.Length, number.Length - 1, true);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator.IsValidNumber(number).Should().BeFalse();
     }
 
     [TestCase("0")]
@@ -193,18 +171,13 @@ public class NumberValidatorTests
     [TestCase("+1")]
     [TestCase("1.1")]
     [TestCase("+1.1")]
-    [Description("Работает с положительными числами, "
-        + "если отрицательные отключены")]
-    public void IsValidNumber_ReturnsTrue_IfNumberIsPositiveAndNegativeNumbersDisabled(
+    [Description("Работает с положительными числами, если отрицательные отключены")]
+    public void IsValidNumber_ReturnsTrue_IfNumberIsPositiveAndNegativeNumbersAreDisabled(
         string number)
     {
-        var numberValidator = new NumberValidator(
-            number.Length,
-            number.Length - 1,
-            true);
+        var numberValidator = new NumberValidator(number.Length, number.Length - 1, true);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeTrue();
+        numberValidator.IsValidNumber(number).Should().BeTrue();
     }
 
     [Test]
@@ -213,15 +186,13 @@ public class NumberValidatorTests
     {
         var length = 10_000;
         var number = new string('1', length);
-
         var numberValidator = new NumberValidator(length, 0, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeTrue();
+        numberValidator.IsValidNumber(number).Should().BeTrue();
     }
 
     [Test]
-    [Description("Работает с большими числами с дробной частью")]
+    [Description("Работает с числами с большой дробной частью")]
     public void IsValidNumber_ReturnsTrue_IfBigNumberWithFractionalPartIsValid()
     {
         var length = 10_000;
@@ -229,8 +200,7 @@ public class NumberValidatorTests
 
         var numberValidator = new NumberValidator(length, length - 1, false);
 
-        numberValidator.IsValidNumber(number)
-            .Should().BeTrue();
+        numberValidator.IsValidNumber(number).Should().BeTrue();
     }
 
     [Test]
@@ -242,10 +212,8 @@ public class NumberValidatorTests
         var numberValidator1 = new NumberValidator(5, 2, false);
         var numberValidator2 = new NumberValidator(3, 1, false);
 
-        numberValidator1.IsValidNumber(number)
-            .Should().BeTrue();
-        numberValidator2.IsValidNumber(number)
-            .Should().BeFalse();
+        numberValidator1.IsValidNumber(number).Should().BeTrue();
+        numberValidator2.IsValidNumber(number).Should().BeFalse();
     }
 
     private static IEnumerable<TestCaseData> GetNotNumbers()
