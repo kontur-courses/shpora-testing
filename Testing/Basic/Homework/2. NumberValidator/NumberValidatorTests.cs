@@ -46,7 +46,7 @@ public class NumberValidatorTests
     [TestCase("+300,52", 17, 10, false, TestName = "When value  is fraction and has sign and separator is comma")]
     [TestCase("1,23", 17, 10, false, TestName = "When value is fraction and separator is comma")]
     [TestCase("+100", 4, 1, true, TestName = "When value is integer has sign")]
-    [TestCase("100\n", 4, 2, true, TestName = "When \n at the of a value")]
+    [TestCase("100\n", 4, 2, true, TestName = "When \n at the end of a value")]
     public void IsValidNumber_ShouldBeTrue_WithValidParams(string value, int precision, int scale, bool onlyPositive) =>
         new NumberValidator(precision, scale, onlyPositive)
             .IsValidNumber(value)
