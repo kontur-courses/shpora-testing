@@ -35,9 +35,9 @@ public partial class NumberValidatorTests
 	}
 
 
-	[TestCase(3, 2, true, "00.00", TestName = "Number length with fractionl part more than precision")]
-	[TestCase(3, 2, true, "-0.0", TestName = "Negative number length with fractionl part more than precision")]
-	[TestCase(3, 2, true, "+0.00", TestName = "Positive number length with fractionl part more than precision")]
+	[TestCase(3, 2, true, "00.00", TestName = "Number length with fractional part more than precision")]
+	[TestCase(3, 2, true, "-0.0", TestName = "Number length with fractional part and sign more than precision")]
+	[TestCase(3, 2, true, "+0.00", TestName = "Number length with sign more than precision and fractional prt equls to scale")]
 	[TestCase(3, 2, true, "a.sd", TestName = "Number consists letters")]
 	[TestCase(17, 2, true, "0.000", TestName = "Length number's frationl part more thn scale")]
 	[TestCase(3, 2, true, "", TestName = "Number is empty string")]
@@ -58,7 +58,7 @@ public partial class NumberValidatorTests
 	[TestCase(1, -2, TestName = "Negative scale")]
 	[TestCase(1, 2, TestName = "Precision less than scale")]
 	[TestCase(1, 1, TestName = "Precision equals with scale")]
-	public void Should_Throw_ArgumentException(int precision, int scale)
+	public void Constructor_Should_Throw_ArgumentException(int precision, int scale)
 	{
 		var action = () => new NumberValidator(precision, scale);
 		action.Should().Throw<ArgumentException>();
@@ -67,7 +67,7 @@ public partial class NumberValidatorTests
 
 	[TestCase(1, 0, TestName = "Zero scale")]
 	[TestCase(2, 1, TestName = "Precision more than scale")]
-	public void Should_NotThrow_AnyException(int precision, int scale)
+	public void Constructor_Should_NotThrow_AnyException(int precision, int scale)
 	{
 		var action = () => new NumberValidator(precision, scale);
 		action.Should().NotThrow();
