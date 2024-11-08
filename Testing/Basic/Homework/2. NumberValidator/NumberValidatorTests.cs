@@ -1,48 +1,55 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [TestCase(-1,2,true,ExpectedResult = true,TestName = "Negative precision")]
-    [TestCase(1,0,true,ExpectedResult = false,TestName = "Not catch Exception")]
-    [TestCase(2,5,true,ExpectedResult = true,TestName = "Precision less then scale")]
-    [TestCase(2,-3,true,ExpectedResult = true,TestName = "Negative scale")]
-    public bool NumberValidator_Exceptions_Test(int precision, int scale, bool onlyPositive)
+    [TestCase(-1, 2, true, TestName = "Negative precision")]
+    [TestCase(2, 5, true, TestName = "Precision less then scale")]
+    [TestCase(2, -3, true, TestName = "Negative scale")]
+    [TestCase(-5, -3, true, TestName = "Negative scale and Precision less then scale ")]
+    [TestCase(null, null, null, TestName = "Null input data")]
+    public void NumberValidator_ShouldThrowArgumentException_WithIncorrectData(int precision, int scale,
+        bool onlyPositive)
     {
-        try
-        {
-            new NumberValidator(precision, scale, onlyPositive);
-        }
-        catch (ArgumentException)
-        {
-            return true;
-        }
-        
-        return false;
+        Action act = () => new NumberValidator(precision, scale, onlyPositive);
+        act.Should().Throw<ArgumentException>();
     }
 
-    [Test, TestCaseSource(nameof(NumberValidatorTestCases))]
-    public bool IsValidNumber(NumberValidator numberValidator, String number)
+    [Test]
+    public void NumberValidator_ShouldNotThrowArgumentException_WithCorrectData()
     {
+        Action act = () => new NumberValidator(1, 0, true);
+        act.Should().NotThrow<ArgumentException>();
+    }
+
+    [TestCase(8, 2, true, "0.0", ExpectedResult = true)]
+    [TestCase(3, 0, true, "0", ExpectedResult = true)]
+    [TestCase(4, 2, false, "-1.24", ExpectedResult = true)]
+    [TestCase(4, 2, false, "-1.24", ExpectedResult = true)]
+    public bool NumberValidator_ShouldReturnTrue_WithCorrectData(int precision, int scale, bool onlyPositive,
+        String number)
+    {
+        NumberValidator numberValidator = new NumberValidator(precision, scale, onlyPositive);
         return numberValidator.IsValidNumber(number);
     }
 
-    public static IEnumerable<TestCaseData> NumberValidatorTestCases
+    [TestCase(4, 2, true, "-1.23", ExpectedResult = false)]
+    [TestCase(5, 2, true, "1.253", ExpectedResult = false)]
+    [TestCase(3, 0, false, "a.ds", ExpectedResult = false)]
+    [TestCase(4, 2, false, "", ExpectedResult = false)]
+    [TestCase(5, 2, true, "+-1.25", ExpectedResult = false)]
+    [TestCase(5, 2, true, null, ExpectedResult = false)]
+    [TestCase(3, 0, true, "1234", ExpectedResult = false)]
+    [TestCase(5, 2, true, "\r", ExpectedResult = false)]
+    [TestCase(3, 0, true, "1 23", ExpectedResult = false)]
+    [TestCase(3, 0, true, " 2.3", ExpectedResult = false)]
+    public bool NumberValidator_ShouldReturnFalse_WithInCorrectData(int precision, int scale, bool onlyPositive,
+        String number)
     {
-        get
-        {
-            yield return new TestCaseData(new NumberValidator(8, 2, true), "0.0").Returns(true);
-            yield return new TestCaseData(new NumberValidator(3, 0, true), "0").Returns(true);
-            yield return new TestCaseData(new NumberValidator(4, 2, true), "-1.23").Returns(false);
-            yield return new TestCaseData(new NumberValidator(4, 2, false), "-1.24").Returns(true);
-            yield return new TestCaseData(new NumberValidator(5, 2, true), "1.253").Returns(false);
-            yield return new TestCaseData(new NumberValidator(3, 2, false), "a.ds").Returns(false); 
-            yield return new TestCaseData(new NumberValidator(4, 2, true), "").Returns(false);
-            yield return new TestCaseData(new NumberValidator(5, 2, true), "+-1.25").Returns(false);
-            yield return new TestCaseData(new NumberValidator(5, 2, true), null).Returns(false);
-            yield return new TestCaseData(new NumberValidator(3, 0, true), "1234").Returns(false);
-        }
+        NumberValidator numberValidator = new NumberValidator(precision, scale, onlyPositive);
+        return numberValidator.IsValidNumber(number);
     }
 }
