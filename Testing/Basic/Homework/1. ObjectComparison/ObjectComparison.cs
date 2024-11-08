@@ -24,7 +24,7 @@ public class ObjectComparison
 
         // Перепишите код на использование Fluent Assertions.
         actualTsar.Should()
-            .BeEquivalentTo(expectedTsar, options => options.Excluding(ctx => ComparePerson(ctx)));
+            .BeEquivalentTo(expectedTsar, options => options.Using(new PersonComparer()));
 
         /*
          * Достоинства подхода по сравнению с CheckCurrentTsar_WithCustomEquality
@@ -34,14 +34,24 @@ public class ObjectComparison
          * 4. Тест стал более читаемым
          */
     }
-
-    private bool ComparePerson(IMemberInfo ctx)
+    
+    public class PersonComparer : IEquivalencyStep
     {
-        var parentInfo = ctx.GetType()
-            ?.GetField("member", BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.GetValue(ctx) as Field;
+        public EquivalencyResult Handle(Comparands comparands, IEquivalencyValidationContext context, IEquivalencyValidator nestedValidator)
+        {
+            if (context.CurrentNode.Type == typeof(Person))
+            {
+                comparands.Subject.Should().BeEquivalentTo(comparands.Expectation, opt => opt.Excluding(x => ExcludeId(x)));
 
-        return parentInfo?.ParentType == typeof(Person) && ctx.Path.EndsWith("Id");
+                return EquivalencyResult.AssertionCompleted;
+            }
+
+            return EquivalencyResult.ContinueWithNext;
+        }
+        private bool ExcludeId(IMemberInfo info)
+        {
+            return info.Name == "Id";
+        }
     }
 
 
