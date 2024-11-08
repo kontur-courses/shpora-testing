@@ -17,11 +17,11 @@ public class NumberValidatorTests
             .Should().NotThrow();
     }
 
-    [TestCase(-1, 2, TestName = "NumberValidator_Throw_WhenPrecisionIsNegative")]
-    [TestCase(0, 2, TestName = " NumberValidator_Throw_WhenPrecisionIsZero")]
-    [TestCase(4, 4, TestName = "NumberValidator_Throw_WhenPrecisionEqualsScale")]
-    [TestCase(10, -2, TestName = "NumberValidator_Throw_WhenScaleIsNegative")]
-    [TestCase(1, 2, TestName = "NumberValidator_Throw_WhenPrecisionLessThanScale")]
+    [TestCase(-1, 2, TestName = "WhenPrecisionIsNegative")]
+    [TestCase(0, 2, TestName = "WhenPrecisionIsZero")]
+    [TestCase(4, 4, TestName = "WhenPrecisionEqualsScale")]
+    [TestCase(10, -2, TestName = "WhenScaleIsNegative")]
+    [TestCase(1, 2, TestName = "WhenPrecisionLessThanScale")]
     public void NumberValidator_Throw(int precision, int scale)
     {
         Action act = () => new NumberValidator(precision, scale);
@@ -41,7 +41,7 @@ public class NumberValidatorTests
     [TestCase("我們.我們")]
     [TestCase("مان.ود")]
     [TestCase("^879%56(")]
-    public void IsValidNumber_ReturnsFalse_WhenValueContainsNonDigitSymbols(string value)
+    public void WhenValueContainsNonDigitSymbols(string value)
     {
         IsValidNumber_ReturnsFalse(value, 12, 7);
     }
@@ -57,7 +57,7 @@ public class NumberValidatorTests
     [TestCase("-0.00.0")]
     [TestCase("0,.000")]
     [TestCase("+0,00.0")]
-    public void IsValidNumber_ReturnsFalse_WhenValueHaveFewSeparators(string value)
+    public void WhenValueHaveFewSeparators(string value)
     {
         IsValidNumber_ReturnsFalse(value, 17, 16);
     }
@@ -69,7 +69,7 @@ public class NumberValidatorTests
     [TestCase("++0.000")]
     [TestCase("+")]
     [TestCase("+.0-00")]
-    public void IsValidNumber_ReturnsFalse_WhenValueHaveFewSigns(string value)
+    public void WhenValueHaveFewSigns(string value)
     {
         IsValidNumber_ReturnsFalse(value, 17, 16);
     }
@@ -82,17 +82,17 @@ public class NumberValidatorTests
     [TestCase("=")]
     [TestCase("-")]
     [TestCase("+")]
-    public void IsValidNumber_ReturnsFalse_WhenSeparatorNotCommaOrDot(string separator)
+    public void WhenSeparatorNotCommaOrDot(string separator)
     {
         IsValidNumber_ReturnsFalse($"0{separator}0", 3, 2, true);
     }
 
-    [TestCase("0.0", 17, 2, true, TestName = "IsValidNumber_ReturnsTrue_WhenPrecisionAndScaleMoreThanValueIntAndFracParts")]
-    [TestCase("0,0", 3, 2, true, TestName = "IsValidNumber_ReturnsTrue_WhenSeparatorIsComma")]
-    [TestCase("0", 17, 2, true, TestName = " IsValidNumber_ReturnsTrue_WhenValueIsIntegerAndHasLessDigitsThanPrecision")]
-    [TestCase("12345", 5, 2, true, TestName = "IsValidNumber_ReturnsTrue_WhenValueIsIntegerAndDigitCountEqualsPrecision")]
-    [TestCase("+1.23", 4, 2, true, TestName = "IsValidNumber_ReturnsTrue_WhenLengthIntPartAndFracPartEqualToPrecision_IncludingNumberSign")]
-    [TestCase("-1.23", 5, 2, TestName = "IsValidNumber_ReturnsTrue_WhenValueIsNegativeAndValidatorNotOnlyPositive")]
+    [TestCase("0.0", 17, 2, true, TestName = "WhenPrecisionAndScaleMoreThanValueIntAndFracParts")]
+    [TestCase("0,0", 3, 2, true, TestName = "WhenSeparatorIsComma")]
+    [TestCase("0", 17, 2, true, TestName = " WhenValueIsIntegerAndHasLessDigitsThanPrecision")]
+    [TestCase("12345", 5, 2, true, TestName = "WhenValueIsIntegerAndDigitCountEqualsPrecision")]
+    [TestCase("+1.23", 4, 2, true, TestName = "WhenLengthIntPartAndFracPartEqualToPrecision_IncludingNumberSign")]
+    [TestCase("-1.23", 5, 2, TestName = "WhenValueIsNegativeAndValidatorNotOnlyPositive")]
     public void IsValidNumber_ReturnsTrue(string value, int precision, int scale, bool onlyPositive=false)
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
@@ -103,15 +103,15 @@ public class NumberValidatorTests
             .Should().BeTrue();
     }
 
-    [TestCase("+1.23", 3, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForPositiveNumber")]
-    [TestCase("-1.23", 3, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenNumberLengthMoreThanPrecision_IncludingSignForNegativeNumber")]
-    [TestCase("0.000", 17, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueFracPartMoreThanScale")]
-    [TestCase("00.00", 3, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueSymbolsCountMoreThanPrecision")]
-    [TestCase("", 3, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueIsEmptyString")]
-    [TestCase("34290.", 17, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueHaveSeparatorWithoutFracPart")]
-    [TestCase(null, 3, 2, TestName = "IsValidNumber_ReturnsFalse_WhenValueIsNull")]
-    [TestCase("-0.00", 4, 2, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueNegative_WithOnlyPositiveNumberValidator")]
-    [TestCase(".000", 6, 4, true, TestName = "IsValidNumber_ReturnsFalse_WhenValueStartsWithSeparator")]
+    [TestCase("+1.23", 3, 2, true, TestName = "WhenNumberLengthMoreThanPrecision_IncludingSignForPositiveNumber")]
+    [TestCase("-1.23", 3, 2, true, TestName = "WhenNumberLengthMoreThanPrecision_IncludingSignForNegativeNumber")]
+    [TestCase("0.000", 17, 2, true, TestName = "WhenValueFracPartMoreThanScale")]
+    [TestCase("00.00", 3, 2, true, TestName = "WhenValueSymbolsCountMoreThanPrecision")]
+    [TestCase("", 3, 2, true, TestName = "WhenValueIsEmptyString")]
+    [TestCase("34290.", 17, 2, true, TestName = "WhenValueHaveSeparatorWithoutFracPart")]
+    [TestCase(null, 3, 2, TestName = "WhenValueIsNull")]
+    [TestCase("-0.00", 4, 2, true, TestName = "WhenValueNegative_WithOnlyPositiveNumberValidator")]
+    [TestCase(".000", 6, 4, true, TestName = "WhenValueStartsWithSeparator")]
     public void IsValidNumber_ReturnsFalse(string value, int precision, int scale, bool onlyPositive = false)
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
