@@ -8,7 +8,7 @@ public class ObjectComparison
     [Test]
     [Description("Проверка текущего царя")]
     [Category("ToRefactor")]
-    public void CheckCurrentTsar()
+    public void TsarRegistry_ShouldBeEqual_WithCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
