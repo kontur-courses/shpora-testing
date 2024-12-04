@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -6,7 +7,6 @@ public class ObjectComparison
 {
     [Test]
     [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
@@ -14,16 +14,11 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(
+            expectedTsar,
+            options => options
+                .Excluding(member => member.DeclaringType == typeof(Person)
+                    && member.Name == nameof(Person.Id)));
     }
 
     [Test]
@@ -34,7 +29,18 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        // Какие недостатки у такого подхода?
+        //
+        // Решение с FluentAssertions лучше тем, что оно:
+        // 1. позволяет не изменять проверяющую на равенство часть метода при добавлении новых полей и свойств классу Person.
+        // Они автоматически будут проверяться.
+        // Если проверять их не нужно, их можно исключить из проверки, добавив Excluding.
+        // 2. лучше читается.
+        // Видно, что объекты сравниваются по всем полям, кроме Id.
+        // В альтернативном решении нужно искать, какие поля присутствуют в сравнении, а какие - нет.
+        // 3. работает для каждого типа.
+        // Альтернативное решение предполагает, что мы должны каждый раз писать новый метод AreEqual.
+
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
