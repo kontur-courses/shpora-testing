@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -13,17 +14,8 @@ public class ObjectComparison
 
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        actualTsar.IsEqual(expectedTsar);
     }
 
     [Test]
@@ -35,6 +27,14 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        /*
+         * 1) Если у класса изменять поля (удалять или добавлять), то также придется изменять
+         * логику проверки на соответствие сущностей. В случае с удалением поля программа вообще не скомпилируется
+         * 2) Возможна бесконечная рекурсия
+         * 3) При падении теста не поймем в чем была причина. Ожидался True, а получили False, вот и вся инфа(
+         * 4) Использование FluentAssertion ускоряет понимание логики секции проверки, за счет использования
+         * method chaining. В данном тесте вникнуть в логику проверки теста сложнее, чем в первом.
+         */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
@@ -48,5 +48,18 @@ public class ObjectComparison
             && actual.Height == expected.Height
             && actual.Weight == expected.Weight
             && AreEqual(actual.Parent, expected.Parent);
+    }
+}
+
+internal static class ObjectComparisonAssertExtensions
+{
+    public static void IsEqual(this Person actualTsar, Person expectedTsar)
+    {
+        actualTsar.Should().BeEquivalentTo(
+            expectedTsar,
+            options => options
+                .Excluding(x => x.Name == nameof(Person.Id) && x.DeclaringType == typeof(Person))
+                .AllowingInfiniteRecursion()
+                .IgnoringCyclicReferences());
     }
 }
