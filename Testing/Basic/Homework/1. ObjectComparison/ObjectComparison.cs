@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +15,11 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar,
+            options => options
+                .IgnoringCyclicReferences()
+                .AllowingInfiniteRecursion()
+                .Excluding(memberInfo => memberInfo.Name == nameof(Person.Id) && memberInfo.DeclaringType == typeof(Person)));
     }
 
     [Test]
@@ -34,7 +30,15 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        /* Какие недостатки у такого подхода?
+             1) В метод можно передать только параметры класса Person, для других классов нужен будет новый метод.
+             2) Плохая читаемость и выразительность в сравнении с использованием FluentAssertions
+             3) При расширении класса Person необходимо вносить изменения в метод AreEqual
+             4) Метод AreEqual возвращает bool, из-за чего не понятно, в чем именно объекты не совпадают
+             5) Нет проверки на зацикливание вложенных объектов
+             6) Зачем реализовывать то, что уже есть в FluentAssertions?
+             Такой метод тяжело поддерживать.
+         */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
