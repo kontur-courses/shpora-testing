@@ -1,12 +1,13 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
 
-namespace P1.Basic.Samples.Antipatterns;
+namespace Basic.Samples._3._Antipatterns;
 
 [TestFixture]
-public class Stack1_Tests
+public class Stack1Tests
 {
     [Test]
+    [Explicit]
     public void Test1()
     {
         var lines = File.ReadAllLines(@"C:\work\edu\testing-course\Patterns\bin\Debug\data.txt")
