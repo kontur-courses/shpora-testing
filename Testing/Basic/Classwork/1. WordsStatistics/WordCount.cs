@@ -1,9 +1,15 @@
 ﻿namespace Basic.Task.WordsStatistics.WordsStatistics;
 
-public struct WordCount(string word, int count)
+public struct WordCount
 {
-    public string Word { get; set; } = word;
-    public int Count { get; set; } = count;
+    public WordCount(string word, int count)
+    {
+        Word = word;
+        Count = count;
+    }
+    
+    public string Word { get; set; }
+    public int Count { get; set; }
 
     public static WordCount Create(KeyValuePair<string, int> pair)
     {
