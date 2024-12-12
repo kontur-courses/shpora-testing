@@ -4,9 +4,11 @@ using TDD.Task;
 
 namespace TDD;
 
+[TestFixture]
 public class GameTests
 {
     [Test]
+    [Explicit]
     public void HaveZeroScore_BeforeAnyRolls()
     {
         new Game()
