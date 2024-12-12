@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +15,17 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        actualTsar.Should()
+            .BeEquivalentTo(expectedTsar,
+            options => options
+                .Excluding(x => x.Id)
+                .Excluding(x => x.Parent!.Id));
 
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        //1. ипользование метода CheckCurrentTsar_WithCustomEquality сложнее в понимании
+        //использование FluentAssertions повышает простоту и читаемость кода;
+        //2. после создания каждого нового поля, нужно добавлять его в метод
+        //в моем методе добавлять нужно только поля, которые нужно исключить из сравнения
+        //таких полей намного меньше, поэтому количество изменений метода меньше;
     }
 
     [Test]
