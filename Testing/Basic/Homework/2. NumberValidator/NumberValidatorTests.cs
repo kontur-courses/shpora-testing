@@ -1,53 +1,37 @@
-﻿
+﻿using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
+
 
 namespace HomeExercise.Tasks.NumberValidator;
 
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void Test()
-    {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
     
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
-    }
-
-
-    [Test]
-    public void Constructor_ThrowExceptions_InvalidParameter()
+    [TestCase(-1, 2, true, TestName = "Отрицательная precision")]
+    [TestCase(5, -1, true, TestName = "Отрицательная scale")]
+    [TestCase(5, 5, true, TestName = "Scale равен precision")]
+    [TestCase(5, 6, true, TestName = "Scale больше precision")]
+    [TestCase(0, 0, true, TestName = "Precision ноль")]
+    public void Constructor_ThrowExceptions_InvalidParameter(int precision, int scale, bool onlyPositive)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(5, -1));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(5, 5)); 
-        Assert.Throws<ArgumentException>(() => new NumberValidator(5, 6));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(0, 0));
+        Action act = () => new NumberValidator(precision, scale, onlyPositive);
+        
+        act.Should().Throw<ArgumentException>();
     }
     
-    [Test]
-    public void Constructor_DoesNotThrowExceptions_CorrectParameter()
+    
+    [TestCase(1, 0, true, TestName = "Минимальные валидные параметры")]
+    [TestCase(1, 0, false, TestName = "OnlyPositive false")]
+    [TestCase(5, 2, true, TestName = "Scale меньше precision")]
+    [TestCase(3, 0, true, TestName = "Scale ноль")]
+    public void Constructor_DoesNotThrowExceptions_CorrectParameter(int precision, int scale, bool onlyPositive)
     {
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1));
-        Assert.DoesNotThrow(() => new NumberValidator(5, 2));
-        Assert.DoesNotThrow(() => new NumberValidator(5, 2, true));
+        Action act = () => new NumberValidator(precision, scale, onlyPositive);
+        
+        act.Should().NotThrow();
     }
+    
     
     [TestCase(17, 2, true, "0", TestName = "Целое число ноль должно быть валидным")]
     [TestCase(17, 2, true, "0.0", TestName = "Дробное число ноль должно быть валидным")]
@@ -58,9 +42,12 @@ public class NumberValidatorTests
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
         
-        ClassicAssert.IsTrue(validator.IsValidNumber(value));
+        var result = validator.IsValidNumber(value);
+
+        result.Should().BeTrue();
     }
 
+    
     [TestCase(3, 2, true, "00.00", TestName = "Превышение общего лимита цифр")]
     [TestCase(3, 2, true, "-0.00", TestName = "Отрицательное число при запрете отрицательных")]
     [TestCase(3, 2, true, "+0.00", TestName = "Знак плюс с нулем превышает лимит цифр")]
@@ -73,7 +60,9 @@ public class NumberValidatorTests
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
         
-        ClassicAssert.IsFalse(validator.IsValidNumber(value));
+        var result = validator.IsValidNumber(value);
+        
+        result.Should().BeFalse();
     }
 
 
@@ -83,6 +72,9 @@ public class NumberValidatorTests
     public void IsValidNumber_BoundaryCases_ReturnsTrue(int precision, int scale, bool onlyPositive, string value)
     {
         var validator = new NumberValidator(precision, scale, onlyPositive);
-        ClassicAssert.IsTrue(validator.IsValidNumber(value));
+        
+        var result = validator.IsValidNumber(value);
+        
+        result.Should().BeTrue();
     }
 }
