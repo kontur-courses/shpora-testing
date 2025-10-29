@@ -16,8 +16,8 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
         
         actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
-            .Excluding(t => t.Id)
-            .Excluding(t => t.Parent.Id));
+            .Excluding(t => t.DeclaringType == typeof(Person) && t.Name == nameof(Person.Id)));
+        //избегаем падения теста при добавлении предков, не сравнивая Id любого объекта класса Person
     }
 
     [Test]
