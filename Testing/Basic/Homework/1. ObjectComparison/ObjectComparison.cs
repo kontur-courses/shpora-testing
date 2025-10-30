@@ -14,7 +14,11 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, 99999999,
             new Person("Vasili III of Russia", 28, 170, 60, 99999999, null));
         
-        actualTsar.Should().BeEquivalentTo(expectedTsar, config => config.Excluding(x => x.Id).Excluding(x => x.Parent.Id));
+        actualTsar.Should()
+            .BeEquivalentTo(expectedTsar, 
+                config => config
+                    .Excluding(person => person.Id)
+                    .Excluding(person => person.Parent.Id));
         // Я специально для теста добавил одно поле, а сам тест остался неизменен. По сути, его нужно изменять только в случае, если нужно добавить какое-то поле в игнор
         // типа того, как я добавил айдишники людей, т. е. там скорее всего окажутся только поля, которые должны быть уникальными для каждого объекта, а таких вряд ли будет прям много
     }
