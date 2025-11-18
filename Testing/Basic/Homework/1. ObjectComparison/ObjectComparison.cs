@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -10,20 +11,13 @@ public class ObjectComparison
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-
+        
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(x => x.DeclaringType == typeof(Person) && x.Name == nameof(Person.Id))
+            .IgnoringCyclicReferences());
     }
 
     [Test]
@@ -36,6 +30,16 @@ public class ObjectComparison
 
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
+        
+        // Недостаток такого подхода заключается в том, что мы добавялем метод,
+        // который работает неизвестно как и его надо посмотреть,
+        // чтобы понять, как именно сравниваются экзмепляры класса.
+        // Также добавление новых полей в Person приведет к тому,
+        // что метод проверит только ранее указанные поля,
+        // новые придется вводить в ручную,
+        // в моем решении проверяются все поля за исключением поля Id, что не мешает расширяемости.
+        // И мое решение короче, в одну строку, и понятно что делается по названию методов
+        // Такой подход не работает правильно с циклическими ссылками и не отображает сообщения об ошибке, непонятно что именно не так
     }
 
     private bool AreEqual(Person? actual, Person? expected)
