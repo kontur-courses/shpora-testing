@@ -1,9 +1,17 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Reflection;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
+using Homework._1._ObjectComparison;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
+    
     [Test]
     [Description("Проверка текущего царя")]
     [Category("ToRefactor")]
@@ -15,16 +23,37 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        actualTsar.Should()
+            .BeEquivalentTo(expectedTsar, options => options.Using(new PersonComparer()));
 
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        /*
+         * Достоинства подхода по сравнению с CheckCurrentTsar_WithCustomEquality
+         * 1. В случае падения теста в сообщении прописывается место несовпадения, ожидаемый результат и полученный результат.
+         * 2. При добавлении в класс нового поля тест нужно будет изменять только в случае добавления особых проверок, то есть он лучше расширяем.
+         * 3. Проверки полей не блокируют друг друга, при несовпадении нескольких полей будет выведено отдельное сообщение для каждого.
+         * 4. Тест стал более читаемым
+         */
     }
+    
+    public class PersonComparer : IEquivalencyStep
+    {
+        public EquivalencyResult Handle(Comparands comparands, IEquivalencyValidationContext context, IEquivalencyValidator nestedValidator)
+        {
+            if (context.CurrentNode.Type == typeof(Person))
+            {
+                comparands.Subject.Should().BeEquivalentTo(comparands.Expectation, opt => opt.Excluding(x => ExcludeId(x)));
+
+                return EquivalencyResult.AssertionCompleted;
+            }
+
+            return EquivalencyResult.ContinueWithNext;
+        }
+        private bool ExcludeId(IMemberInfo info)
+        {
+            return info.Name == "Id";
+        }
+    }
+
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
@@ -34,7 +63,10 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Какие недостатки у такого подхода? 
+        // Какие недостатки у такого подхода?
+        // 1. Не очевидно, где произошло несовпадение в случае падения теста.
+        // 2. При добавлении в класс нового поля придётся изменять метод AreEqual
+        // 3. Проверки полей блокируют друг друга. Например, при несовпадении имён другие поля проверяться уже не будут.
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
