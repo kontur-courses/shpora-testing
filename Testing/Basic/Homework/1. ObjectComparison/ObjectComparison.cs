@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -10,20 +11,11 @@ public class ObjectComparison
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
+            options.Excluding(x => x.Name == nameof(Person.Id) && x.DeclaringType == typeof(Person)));
     }
 
     [Test]
@@ -35,6 +27,19 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        /*
+         * 1. Метод AreEqual проверяет только определенные свойства класса, поэтому если
+         * в будущем придется добавить новые или удалить текущие, то их также придется
+         * добавить/удалить в этом методе.
+         * 2. Написание собственного метода для проверки равенства теоретически усложнит
+         * понимание теста, так как нужно разобраться в работе написанного метода. При
+         * этом можно было спокойно воспользоваться стандартными методами.
+         * 3. Так как метод возвращает bool, то и сравнивать результат этого метода
+         * приходится с True/False, поэтому при провале теста мы не получаем
+         * конкретной информации в чем была проблема. В отличие от первого теста с
+         * применением AreEqual для каждого поля в отдельности. (если используем
+         * FluentAssertions, то вообще сказка)
+         */
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
