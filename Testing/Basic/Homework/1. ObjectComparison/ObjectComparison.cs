@@ -1,39 +1,32 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
+    private readonly Person actualTsar = TsarRegistry.GetCurrentTsar();
+
+    private readonly Person expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
+        new Person("Vasili III of Russia", 28, 170, 60, null));
+
     [Test]
-    [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
-    public void CheckCurrentTsar()
+    [Description("Проверка текущего царя, с родителями")]
+    public void CheckCurrentTsar_WithParentRecursive()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
-
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
+            options
+                .Excluding(tsar =>
+                    tsar.Name == nameof(Person.Id) &&
+                    tsar.DeclaringType == typeof(Person))
+        );
     }
-
+    
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
     public void CheckCurrentTsar_WithCustomEquality()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
@@ -50,3 +43,28 @@ public class ObjectComparison
             && AreEqual(actual.Parent, expected.Parent);
     }
 }
+/*    [Test]
+    [Description("Проверка всей родни текущего царя")]
+    public void CheckCurrentTsarParent()
+    {
+        var actualTsarParent = actualTsar.Parent;
+        var expectedParentTsar = expectedTsar.Parent;
+
+        while (actualTsarParent is not null && expectedParentTsar is not null)
+        {
+            actualTsarParent.Should().BeEquivalentTo(expectedParentTsar, options => options
+                .Excluding(parent => parent.Id)
+                .Excluding(parent => parent.Parent));
+            actualTsarParent = actualTsarParent.Parent;
+            expectedParentTsar = expectedParentTsar.Parent;
+        }
+    }*/
+// Моё решение лучше предыдущего, т.к. в случае ошибки точно покажет лог,
+// FluentAssertions, даёт возможность узнать в подробностях в каком месте
+// проблема, прошлое решение такого не давало.
+// Также в прошлом решении CheckCurrentTsar_WithCustomEquality()
+// приходилось перечислять все поля, а мы просто исключили не нужные.
+// Но самый большой плюс нового решения это расширяемость,
+// можно добавить новые поля, удалить старые, т.к. проверка по всем полям,
+// но с исключением. Также я разбил на два теста, чтобы повысить читаемость.
+
