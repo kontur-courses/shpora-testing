@@ -1,29 +1,26 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
+using NUnit.Framework.Internal;
 
 namespace HomeExercise.Tasks.ObjectComparison;
-public class ObjectComparison
+public class ObjectComparisonTest
 {
+    private static Person ExpectedTsar() => new Person("Ivan IV The Terrible", 54, 170, 70,
+        new Person("Vasili III of Russia", 28, 170, 60, null));
+
     [Test]
     [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
+
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
 
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+        actualTsar.Should().BeEquivalentTo(ExpectedTsar(), options => options
+            .Excluding(memberInfo =>
+                memberInfo.Name == nameof(Person.Id)
+                && memberInfo.DeclaringType == typeof(Person)));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
     }
 
     [Test]
@@ -35,6 +32,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        // Если бы за полями класса стояла бы какая-то нетривиальная логика, то хотелось, чтобы тесты
+        //отражали проверку каждого по отдельности. Мне кажется, что альтернативное решение не обеспечивает
+        //необходимую наглядность и скорее всего оказалось бы сложным для отладки
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
