@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
     [Test]
@@ -15,15 +17,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(predicate: info => info.Name == nameof(Person.Id)
+            ));
     }
 
     [Test]
@@ -35,6 +31,8 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        //Проблема с читаемостью( сравнение ннго количества полей менее читаемое решение,
+        //чем сравнивание всех полей исключая поле Id), необходимость обновлять метод AreEqual при изменении сигнатуры Person (добавлении или изменении полей)
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
