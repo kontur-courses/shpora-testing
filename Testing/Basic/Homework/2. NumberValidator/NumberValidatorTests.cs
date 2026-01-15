@@ -1,4 +1,5 @@
 ﻿
+using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
@@ -7,25 +8,92 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void Test()
+    [Test, TestCaseSource(nameof(GenerateValidatorTestsWithExceptions))]
+    public void Tests_NumberValidator_WithException(int precision, int scale, bool onlyPositive)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+        var validatorAction = () => new NumberValidator(precision, scale, onlyPositive);
+        validatorAction.Should().Throw<ArgumentException>();
+    }
 
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
+    public static IEnumerable<TestCaseData> GenerateValidatorTestsWithExceptions
+    {
+        get
+        {
+            var tests = new[]
+            {
+                new { precision = -1, scale = 2, onlyPositive = true},
+                new { precision = -1, scale = 2, onlyPositive = false},
+                new { precision = 1, scale = -1, onlyPositive = false},
+                new { precision = 1, scale = 10, onlyPositive = false},
+            };
+            foreach (var test in tests)
+            {
+                yield return new TestCaseData(test.precision, test.scale, test.onlyPositive)
+                    .SetName($"Exception should be thrown with {test.precision} precision, {test.scale} scale, {test.onlyPositive} onlyPositive");
+            }
+        }
+    }
+
+    [Test, TestCaseSource(nameof(GenerateValidatorTestsWithoutExceptions))]
+    public void Tests_NumberValidator_WithoutException(int precision, int scale, bool onlyPositive)
+    {
+        var validatorAction = () => new NumberValidator(precision, scale, onlyPositive);
+        validatorAction.Should().NotThrow<ArgumentException>();
+    }
+
+    public static IEnumerable<TestCaseData> GenerateValidatorTestsWithoutExceptions
+    {
+        get
+        {
+            var tests = new[]
+            {
+                new { precision = 1, scale = 0, onlyPositive = true},
+            };
+            foreach (var test in tests)
+            {
+                yield return new TestCaseData(test.precision, test.scale, test.onlyPositive)
+                    .SetName($"Exception should be thrown with {test.precision} precision, {test.scale} scale, {test.onlyPositive} onlyPositive");
+            }
+        }
+    }
+
+    [Test, TestCaseSource(nameof(GenerateValidatorTestIsValidNumberMethod))]
+    public bool ValidatorTest_IsValidNumber_Method(int precision, int scale, bool onlyPositive, string validatingNumber)
+    {
+        var numberValidator = new NumberValidator(precision, scale, onlyPositive);
+        return numberValidator.IsValidNumber(validatingNumber);
+    }
+
+    public static IEnumerable<TestCaseData> GenerateValidatorTestIsValidNumberMethod
+    {
+        get
+        {
+            var tests = new[]
+            {
+                new { precision = 17, scale = 2, onlyPositive = true, validatingNumber = "0.0", expectingResult = true},
+                new { precision = 17, scale = 2, onlyPositive = true, validatingNumber = "0", expectingResult = true},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "00.00", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "-0.00", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "+0.00", expectingResult = false},
+                new { precision = 4, scale = 2, onlyPositive = true, validatingNumber = "1.23", expectingResult = true},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "+1.23", expectingResult = false},
+                new { precision = 17, scale = 2, onlyPositive = true, validatingNumber = "0.000", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "-1.23", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "a.sd", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "", expectingResult = false},
+                new { precision = 3, scale = 2, onlyPositive = true, validatingNumber = "0,0", expectingResult = true},
+                new { precision = 17, scale = 2, onlyPositive = false, validatingNumber = "+-1.23", expectingResult = false},
+                new { precision = 17, scale = 2, onlyPositive = false, validatingNumber = "-1.23", expectingResult = true},
+                new { precision = 17, scale = 2, onlyPositive = true, validatingNumber = ".23", expectingResult = false},
+                new { precision = 17, scale = 2, onlyPositive = true, validatingNumber = "23.", expectingResult = false},
+            };
+            foreach (var test in tests)
+            {
+                yield return new TestCaseData(test.precision, test.scale, test.onlyPositive, test.validatingNumber)
+                    .Returns(test.expectingResult)
+                    .SetName($"Test with precision: {test.precision}, scale: {test.scale}, onlyPositive: {test.onlyPositive}," +
+                             $"validatingNumber: {test.validatingNumber} should return {test.expectingResult}, but returned {!test.expectingResult}");
+            }
+        }
     }
 }

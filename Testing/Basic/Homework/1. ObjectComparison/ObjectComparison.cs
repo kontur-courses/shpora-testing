@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -10,20 +11,16 @@ public class ObjectComparison
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, 99999999,
+            new Person("Vasili III of Russia", 28, 170, 60, 99999999, null));
+        
+        actualTsar.Should()
+            .BeEquivalentTo(expectedTsar, 
+                config => config
+                    .Excluding(person => person.Id)
+                    .Excluding(person => person.Parent.Id));
+        // Я специально для теста добавил одно поле, а сам тест остался неизменен. По сути, его нужно изменять только в случае, если нужно добавить какое-то поле в игнор
+        // типа того, как я добавил айдишники людей, т. е. там скорее всего окажутся только поля, которые должны быть уникальными для каждого объекта, а таких вряд ли будет прям много
     }
 
     [Test]
@@ -31,10 +28,11 @@ public class ObjectComparison
     public void CheckCurrentTsar_WithCustomEquality()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70, 99999999,
+            new Person("Vasili III of Russia", 28, 170, 60, 99999999, null));
 
         // Какие недостатки у такого подхода? 
+        // Этот код более читаем, чем был изначальный вариант в первом тесте, но его необходимо будет изменять каждый раз, когда мы будем менять класс, который тестируем
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
