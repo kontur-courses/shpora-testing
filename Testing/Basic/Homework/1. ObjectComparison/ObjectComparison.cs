@@ -1,7 +1,27 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
+/*
+ * Изучив документацию FluentAssertions я обнаружил метод BeEquivalentTo(),
+ * который умеет сравнивать объекты по их содержимому, то есть не нужно
+ * вручную проверять эквивалентность каждого свойства по отдельности
+ * 
+ * BeEquivalentTo() вторым аргументом принимает Func<EquivalencyOptions<TExpectation>, EquivalencyOptions<TExpectation>>
+ * с помощью него можно настроить правила сравнения, например: в данном случае не нужно
+ * учитывать поле Id, чтобы исключить его из сравнения есть options.Excluding(x => x.Property))
+ * и ExcludingMembersNamed("Id"). Их различие в том, что Excluding(x => x.Property) исключает только сравнение
+ * в корневом элементе, у остальных вложенных Person он будет учитывать поле Id, что не является корректным поведеним.
+ * 
+ * Так как ExcludingMembersNamed() не был доступен в текущей версии FluentAssertions, я уставновил последний релиз
+ * 
+ * Предложенное решение в CheckCurrentTsar_WithCustomEquality() значительно хуже, потому что при изменении Person 
+ * необходимо менять AreEqual() в тестовом проекте, появляется неудобная связанность. BeEquivalentTo() находит новые 
+ * свойства автоматически. Так же при неудачном сравнении в тесте CheckCurrentTsar_WithCustomEquality() мы просто получим
+ * Expected: True But was: False, а BeEquivalentTo() дает понятное сообщение о том, что именно отличается в объектах.
+*/
 public class ObjectComparison
 {
     [Test]
@@ -14,16 +34,8 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => 
+            options.ExcludingMembersNamed("Id"));
     }
 
     [Test]
