@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -15,15 +16,22 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        // ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
+        // ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
+        // ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
+        // ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        //
+        // ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        // Исправленный вариант
+        // FluentAssertions позволяет удобно сравнивать обьекты, регулируя само сравнение (в данном случае исключаем для сравнения уникальные поля Id), благодаря чему
+        // код становится кратким и лаконичным, а также понятным.
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(person => person.Id)
+            .Excluding(person => person.Parent.Id));
     }
 
     [Test]
@@ -35,6 +43,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        // У данного подхода существенный недостаток - это хардкод при сравнении полей обьекта. При изменении/добавлении/удалении полей, данный метод придется
+        // дописывать/переписывать. Оригинальное решение лучше во многом: проще читается, меньше мест где можно допустить ошибку, а также не потребует
+        // переписывания при изменении сравниваемых обьектов.
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
