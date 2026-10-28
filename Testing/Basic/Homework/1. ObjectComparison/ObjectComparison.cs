@@ -1,12 +1,13 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
 {
     [Test]
     [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
+    [Category("Refactored")]
     public void CheckCurrentTsar()
     {
         var actualTsar = TsarRegistry.GetCurrentTsar();
@@ -15,15 +16,9 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar,
+            opt => opt.Excluding(p => p.Id)
+                      .Excluding(p => p.Parent.Id)); 
     }
 
     [Test]
@@ -35,6 +30,15 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+        //Ответ: не исполняет принцип DRY т.к.
+        //повторяет, но при этом является отдельным методом (повторяющим функционал)
+        //от общеизвестной (среди других разработчков) библиотеки FluentAssertions,
+        //что усложняет читаемость среди других разработчиков
+        //При условии actualCsar == actualCsar.Parent метод уйдет в бесконечную рекурсию
+        //при изменении модели нужно будет переписывать AreEqual,
+        //чтобы он проверял новое свойство, или не проверял то, которое мы убрали из модели.
+        //Также, если тест не пройдет, нужно открывать дебагер, чтобы узнать, из-за какого свойства упал тест
+
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 
