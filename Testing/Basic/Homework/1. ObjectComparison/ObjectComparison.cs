@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -14,16 +15,10 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options
+            .Excluding(member =>
+                member.DeclaringType == typeof(Person) &&
+                member.Name == nameof(Person.Id)));
     }
 
     [Test]
@@ -36,6 +31,14 @@ public class ObjectComparison
 
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
+        //1. При изминении Person придется лезть и переписывать AreEqual
+        //2. Объемно
+        //3. Приходится вчитываться в реализацчию
+        //Мой метод лучше, тк:
+        //1. Он автоматически проверяет все поля за исключением Id, тк оно уникально у всех по определению,
+        //что позволяет его не исправлять при изменении Person
+        //2. Он легко читаемый
+        //3. В случае ошибки в тесте, он покажет где именно произошла ошибка, а не просто что тест упал
     }
 
     private bool AreEqual(Person? actual, Person? expected)
