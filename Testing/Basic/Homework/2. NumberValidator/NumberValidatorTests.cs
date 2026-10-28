@@ -1,5 +1,4 @@
-﻿
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.NumberValidator;
@@ -7,25 +6,74 @@ namespace HomeExercise.Tasks.NumberValidator;
 [TestFixture]
 public class NumberValidatorTests
 {
-    [Test]
-    public void Test()
+    [TestCase(-1)]
+    [TestCase(0)]
+    [TestCase(1, -1)]
+    [TestCase(1, 2)]
+    [TestCase(1, 1)]
+    [TestCase(-1, 2)]
+    public void NumberValidator_InvalidArguments_Throw(int precision, int scale = 0)
     {
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, true));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
-        Assert.Throws<ArgumentException>(() => new NumberValidator(-1, 2, false));
-        Assert.DoesNotThrow(() => new NumberValidator(1, 0, true));
+        Assert.That(() => new NumberValidator(precision, scale), Throws.TypeOf<ArgumentException>());
+    }
 
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("00.00"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(17, 2, true).IsValidNumber("0.0"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+0.00"));
-        ClassicAssert.IsTrue(new NumberValidator(4, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("+1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(17, 2, true).IsValidNumber("0.000"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("-1.23"));
-        ClassicAssert.IsFalse(new NumberValidator(3, 2, true).IsValidNumber("a.sd"));
+    [TestCase(1)]
+    [TestCase(2, 1)]
+    [TestCase(17, 2)]
+    public void NumberValidator_ValidArguments_DontThrow(int precision, int scale = 0)
+    {
+        Assert.That(() => new NumberValidator(precision, scale), Throws.Nothing);
+    }
+
+    [TestCase("+1.23", 4, 2, true, TestName = "Знак плюса учитывается в подсчёте длины для precision")]
+    [TestCase("1.23", 3, 2, true,
+        TestName = "Число, имеющее 2 знака после запятой и 1 знак в целой части, имеет precision:3 и scale:2")]
+    [TestCase("1,23", 3, 2, true, TestName = "Разделителем может быть и запятая")]
+    [TestCase("0.0", 2, 1, true,
+        TestName =
+            "Несмотря на то, что по правилам математики 0.0 = 0, согласно спецификации из налоговой 0.0 - число с precision:2 и scale:1")]
+    [TestCase("0", 1, 0, true,
+        TestName = "Число без дробной части имеет scale = 0 и precision, равный длине этого числа")]
+    [TestCase("-123", 4, 0, false, TestName = "Знак минуса учитывается в длине числа")]
+    [TestCase("-1.23", 4, 2, false,
+        TestName = "Знак минуса учитывается в длине числа, даже когда у него есть дробная часть")]
+    public void NumberValidator_IsValidNumber_TypicalInput_ReturnsTrue(string value, int precision, int scale = 0,
+        bool onlyPositive = true)
+    {
+        ClassicAssert.IsTrue(new NumberValidator(precision, scale, onlyPositive).IsValidNumber(value));
+    }
+
+    [TestCase("0.000", 17, 2, TestName = "scale не допускает точность больше заданной")]
+    [TestCase("a.sd", 3, 2, TestName = "буквы вместо цифр недопустимы")]
+    [TestCase("+1.23", 3, 2, TestName = "precision учитывает знак плюс при подсчёте длины целой части числа")]
+    [TestCase("-1.23", 3, 2, TestName = "precision учитывает знак минуса при подсчёте длины целой части числа")]
+    [TestCase("00.00", 3, 2,
+        TestName =
+            "если общая длина(длина целой части и длина дробной части) числа больше чем precision, проверку оно не проходит")]
+    [TestCase("111", 2, TestName = "если длина целого числа больше precision, проверку такое число не проходит")]
+    [TestCase("-0.00", 3, 2,
+        TestName =
+            "Несмотря на то, что по правилам математики -0.00 = 0, согласно спецификации из налоговой это число с precision:4 и scale:2")]
+    [TestCase("+0.00", 3, 2,
+        TestName =
+            "Несмотря на то, что по правилам математики +0.00 = 0, согласно спецификации из налоговой это число с precision:4 и scale:2")]
+    [TestCase("-1", 1, TestName = "при флаге onlyPositive отрицательные числа не проходят проверку")]
+    [TestCase("+", 1, TestName = "Знак плюса без цифр не проходит проверку")]
+    [TestCase("-", 1, TestName = "Знак минуса без цифр не проходит проверку")]
+    [TestCase(".", 2, 1, TestName = "Разделитель(точка) без цифр не проходит проверку")]
+    [TestCase(",", 2, 1, TestName = "Разделитель(запятая) без цифр не проходит проверку")]
+    [TestCase("", 1, TestName = "Пустая строка не является числом и не проходит проверку")]
+    [TestCase(null, 1, TestName = "null не проходит проверку")]
+    [TestCase(" ", 1, TestName = "Строка из пробела не является числом")]
+    [TestCase("1.", 2, 1, TestName = "Число с разделителем без дробной части не проходит проверку")]
+    [TestCase(".1", 2, 1, TestName = "Число с разделителем без целой части не проходит проверку")]
+    [TestCase("1.1.1", 3, 2, TestName = "Число с двумя разделителями не проходит проверку")]
+    [TestCase("++1", 3, TestName = "Число с двумя знаками не проходит проверку")]
+    [TestCase("1+", 2, TestName = "Число со знаком после такого числа не проходит проверку")]
+    [TestCase(" 1", 2, TestName = "Число с пробелом до этого числа не проходит проверку")]
+    [TestCase("1 ", 1, TestName = "Число с пробелом после этого числа не проходит проверку")]
+    public void NumberValidator_IsValidNumber_InvalidInput_ReturnsFalse(string value, int precision, int scale = 0)
+    {
+        ClassicAssert.IsFalse(new NumberValidator(precision, scale).IsValidNumber(value));
     }
 }
