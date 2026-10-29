@@ -1,29 +1,39 @@
 ﻿using NUnit.Framework;
 using NUnit.Framework.Legacy;
+using FluentAssertions;
+using FluentAssertions.Equivalency;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
-{
+{   
     [Test]
-    [Description("Проверка текущего царя")]
-    [Category("ToRefactor")]
+    [Description("Проверка текущего царя из TsarRegistr (сравнение без Id)")]
+    [Category("Refactored")]
     public void CheckCurrentTsar()
     {
+        // Arrange
+        var expectedTsar = new PersonBuilder()
+            .Named("Ivan IV The Terrible")
+            .Aged(54)
+            .WithHeight(170)
+            .WithWeight(70)
+            .WithParent(new PersonBuilder()
+                .Aged(28)
+                .Named("Vasili III of Russia")
+                .WithHeight(170)
+                .WithWeight(60)
+                .WithParent(null)
+                .Build())
+            .Build();
+        
+        // Act
         var actualTsar = TsarRegistry.GetCurrentTsar();
-
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        // Assert
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => 
+           options.Excluding((IMemberInfo member) => 
+               member.Name == "Id" && 
+               member.DeclaringType == typeof(Person)));
     }
 
     [Test]
@@ -49,4 +59,12 @@ public class ObjectComparison
             && actual.Weight == expected.Weight
             && AreEqual(actual.Parent, expected.Parent);
     }
+    
+    /*  1. Неочевидно что сломалось, при падении тест вернет Expected: True But was:  False.
+     *  2. Не соблюдается AAA. Act и Arrange перепутаны местами, между ними нет отступа.
+     *  3. Нет переиспользования кода.
+     *  4. Тест неудобно расширять придется менять сразу несколько мест.
+     *  5. Рекурсия может переполниться.
+     *  6. Если добавить новые поля тест все равно будет зелёный.
+     */
 }
