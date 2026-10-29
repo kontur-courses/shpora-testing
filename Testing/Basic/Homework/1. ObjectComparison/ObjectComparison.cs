@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
@@ -15,15 +17,23 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        
+        // Этот вариант лучше по следующим причинам:
+        // - Теперь нет зависимости от кол-во полей: BeEquivalentTo - сравнивает все поля объекта(в другом тесте
+        // приходится добавлять поля в методе AreEqual()
+        // - Мы видим какие именно поля разные
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options =>
+            options.Excluding((IMemberInfo m) => m.Name == nameof(Person.Id)));
+        
+        // ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
+        // ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
+        // ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
+        // ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        //
+        // ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
+        // ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
     }
 
     [Test]
