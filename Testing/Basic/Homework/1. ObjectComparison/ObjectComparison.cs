@@ -1,7 +1,11 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
+using FluentAssertions.Execution;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
+
 public class ObjectComparison
 {
     [Test]
@@ -14,16 +18,58 @@ public class ObjectComparison
         var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
+        // в прошлой версии была проблема, что тестирование происходило отдельно по каждому полю
+        // при добавлении новых полей или свойств в класс их нужно было бы дописать и в тесты
+        // плюс можно случайно упустить какое-то поле
+        // в этом и есть проблема 
+        actualTsar.Should().BeEquivalentTo(expectedTsar, options => options.Excluding(
+            (IMemberInfo member) => member.Name == nameof(Person.Id)));
+    }
 
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+    [Test]
+    [Description("Проверка на полное соответствие текущего царя")]
+    public void CheckCompletelyCurrentTsar()
+    {
+        // добавил тест на проверку соответствия всех полей 
+        var actualTsar = TsarRegistry.GetCurrentTsar();
+
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
+            new Person("Vasili III of Russia", 28, 170, 60, null));
+
+        using (new AssertionScope())
+        {
+            actualTsar.Name.Should().Be(expectedTsar.Name);
+            actualTsar.Age.Should().Be(expectedTsar.Age);
+            actualTsar.Height.Should().Be(expectedTsar.Height);
+            actualTsar.Weight.Should().Be(expectedTsar.Weight);
+        }
+    }
+
+    [Test]
+    [Description("Проверка на полное соответствие текущего царя с рефлексией")]
+    public void CheckCompletelyCurrentTsarWithReflection()
+    {
+        // стоит ли добавлять такой тест? если в будущем поля Person поменяются,
+        // то такой тест все равно должен работать корректно
+
+        var actualTsar = TsarRegistry.GetCurrentTsar();
+
+        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
+            new Person("Vasili III of Russia", 28, 170, 60, null));
+
+        var properties = typeof(Person).GetProperties();
+
+        using (new AssertionScope())
+        {
+            foreach (var property in properties)
+            {
+                var actualValue = property.GetValue(actualTsar);
+                var expectedValue = property.GetValue(expectedTsar);
+
+                actualValue.Should().BeEquivalentTo(expectedValue,
+                    $"свойство {property.Name} должно совпадать");
+            }
+        }
     }
 
     [Test]
@@ -35,6 +81,13 @@ public class ObjectComparison
             new Person("Vasili III of Russia", 28, 170, 60, null));
 
         // Какие недостатки у такого подхода? 
+
+        // все еще остается проблема, что мы можем упустить поле и что при добавлении новых полей
+        // их так же нужно дописать, только уже в метод AreEqual, это уже проще
+        // при этом в случае неуспешного теста будет мало информации, т.к.
+        // ClassicAssert.True просто сообщит, что ожидалось True, а получено False
+        // кроме того, из-за использования && в условии в случае, например, неверного имени
+        // мы не узнаем результаты проверки возраста, роста ... т.е. остальных полей
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
 

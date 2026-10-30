@@ -5,8 +5,19 @@ namespace HomeExercise.Tasks.NumberValidator;
 public class NumberValidator
 {
     private readonly Regex numberRegex;
+    /// <summary>
+    /// Только положительные
+    /// </summary>
     private readonly bool onlyPositive;
+
+    /// <summary>
+    /// Общее количество цифр с учетом знака, но без учета точки/запятой
+    /// </summary>
     private readonly int precision;
+
+    /// <summary>
+    /// Количество цифр после точки/запятой
+    /// </summary>
     private readonly int scale;
 
     public NumberValidator(int precision, int scale = 0, bool onlyPositive = false)
@@ -18,7 +29,7 @@ public class NumberValidator
             throw new ArgumentException("precision must be a positive number");
         if (scale < 0 || scale >= precision)
             throw new ArgumentException("precision must be a non-negative number less or equal than precision");
-        numberRegex = new Regex(@"^([+-]?)(\d+)([.,](\d+))?$", RegexOptions.IgnoreCase);
+        numberRegex = new Regex(@"^([+-]?)(\d+)([.,](\d+))?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     }
 
     public bool IsValidNumber(string value)
